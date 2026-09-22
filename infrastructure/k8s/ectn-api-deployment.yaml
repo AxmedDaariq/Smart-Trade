@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ectn-api
+  namespace: smart-trade-platform
+  labels:
+    app: ectn-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ectn-api
+  template:
+    metadata:
+      labels:
+        app: ectn-api
+    spec:
+      serviceAccountName: ectn-sa
+      containers:
+        - name: ectn-api
+          image: smarttrade/ectn-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - secretRef:
+                name: ectn-vault-secrets # Bound via Vault Agent Injector
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ectn-api-service
+  namespace: smart-trade-platform
+spec:
+  selector:
+    app: ectn-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

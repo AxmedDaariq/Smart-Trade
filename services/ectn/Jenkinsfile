@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_IMAGE = 'smarttrade/ectn-api'
+        REGISTRY = 'registry.smarttrade.local'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Restore & Build') {
+            steps {
+                sh 'dotnet restore services/ectn/Ectn.Api/Ectn.Api.csproj'
+                sh 'dotnet build services/ectn/Ectn.Api/Ectn.Api.csproj -c Release --no-restore'
+            }
+        }
+
+        stage('Unit & Architecture Tests') {
+            steps {
+                sh 'dotnet test tests/Ectn.UnitTests/Ectn.UnitTests.csproj -c Release --no-build --logger "trx;LogFileName=test_results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+            }
+        }
+
+        stage('Security & Secret Scan') {
+            steps {
+                sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH .'
+                // sh 'gitleaks detect -v'
+            }
+        }
+
+        stage('Container Build & Push') {
+            steps {
+                script {
+                    docker.build("${REGISTRY}/${DOCKER_IMAGE}:${env.BUILD_ID}", "-f services/ectn/Dockerfile .")
+                    docker.withRegistry("https://${REGISTRY}", 'registry-credentials-id') {
+                        docker.image("${REGISTRY}/${DOCKER_IMAGE}:${env.BUILD_ID}").push()
+                        docker.image("${REGISTRY}/${DOCKER_IMAGE}:${env.BUILD_ID}").push("latest")
+                    }
+                }
+            }
+        }
+
+        stage('Update ArgoCD Manifests') {
+            steps {
+                // Update the image tag in the deployment yaml
+                sh "sed -i 's|image: ${REGISTRY}/${DOCKER_IMAGE}:.*|image: ${REGISTRY}/${DOCKER_IMAGE}:${env.BUILD_ID}|g' infrastructure/k8s/ectn-api-deployment.yaml"
+                // Commit and push back to git repo to trigger ArgoCD synchronization
+            }
+        }
+    }
+    
+    post {
+        always {
+            junit 'tests/**/TestResults/*.trx'
+        }
+    }
+}

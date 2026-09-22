@@ -1,0 +1,68 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-postgres-access
+  namespace: smart-db
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres-cluster
+  policyTypes:
+  - Ingress
+  ingress:
+  # Allow connections ONLY from authorized service pods in the prod namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: smart-trade-prod
+      podSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values:
+              - identity-api
+              - payment-api
+              - customs-api
+              - fleet-api
+              - ectn-api
+              - declaration-api
+              - gps-api
+              - anpr-api
+              - corridor-api
+              - integration-api
+              - audit-api
+              - notification-api
+              - analytics-api
+    # Restrict to port 5432
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow connections from the backup cronjob inside the same namespace
+  - from:
+    - podSelector:
+        matchLabels:
+          app: postgres-backup
+    ports:
+    - protocol: TCP
+      port: 5432
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-redis-access
+  namespace: smart-db
+spec:
+  podSelector:
+    matchLabels:
+      app: redis-cluster
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: smart-trade-prod
+    ports:
+    - protocol: TCP
+      port: 6379

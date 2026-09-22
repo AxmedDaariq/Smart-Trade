@@ -1,0 +1,23 @@
+namespace Identity.Domain.Entities;
+
+public class IdentityAuditEntry
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid TenantId { get; set; }
+    public Guid ActorUserId { get; set; }
+    
+    public string Action { get; set; } = string.Empty;
+    public string ResourceType { get; set; } = string.Empty;
+    public string ResourceId { get; set; } = string.Empty;
+    
+    // JSONB fields
+    public string BeforeJson { get; set; } = string.Empty;
+    public string AfterJson { get; set; } = string.Empty;
+    
+    public string Reason { get; set; } = string.Empty;
+    public string IpAddress { get; set; } = string.Empty;
+    public string UserAgent { get; set; } = string.Empty;
+    public string CorrelationId { get; set; } = string.Empty;
+    
+    public DateTime OccurredAtUtc { get; set; } = DateTime.UtcNow;
+}
