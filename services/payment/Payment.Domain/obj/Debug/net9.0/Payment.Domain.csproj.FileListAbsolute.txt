@@ -1,0 +1,12 @@
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\bin\Debug\net9.0\Payment.Domain.deps.json
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\bin\Debug\net9.0\Payment.Domain.dll
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\bin\Debug\net9.0\Payment.Domain.pdb
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.AssemblyInfoInputs.cache
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.AssemblyInfo.cs
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.sourcelink.json
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.dll
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\refint\Payment.Domain.dll
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\Payment.Domain.pdb
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\payment\Payment.Domain\obj\Debug\net9.0\ref\Payment.Domain.dll

@@ -1,0 +1,12 @@
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.AssemblyInfoInputs.cache
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.AssemblyInfo.cs
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.sourcelink.json
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\bin\Debug\net9.0\Customs.Domain.deps.json
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\bin\Debug\net9.0\Customs.Domain.dll
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\bin\Debug\net9.0\Customs.Domain.pdb
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.dll
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\refint\Customs.Domain.dll
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\Customs.Domain.pdb
+C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\customs\Customs.Domain\obj\Debug\net9.0\ref\Customs.Domain.dll

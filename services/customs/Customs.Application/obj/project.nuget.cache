@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "UsGAFTy6aX8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Tariq\\.gemini\\antigravity-ide\\scratch\\smart-trade-logistics-platform\\services\\customs\\Customs.Application\\Customs.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Tariq\\.nuget\\packages\\fluentvalidation\\11.7.1\\fluentvalidation.11.7.1.nupkg.sha512",
+    "C:\\Users\\Tariq\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.7.1\\fluentvalidation.dependencyinjectionextensions.11.7.1.nupkg.sha512",
+    "C:\\Users\\Tariq\\.nuget\\packages\\mediatr\\12.1.1\\mediatr.12.1.1.nupkg.sha512",
+    "C:\\Users\\Tariq\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\Tariq\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

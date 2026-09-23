@@ -26,22 +26,31 @@ public class CustomsStateTransitionPolicy : ICustomsStateTransitionPolicy
             (CustomsStatus.NoInspection, CustomsStatus.Assessment) => true,
             (CustomsStatus.Assessment, CustomsStatus.DutyAssessed) => true,
             (CustomsStatus.DutyAssessed, CustomsStatus.PaymentPending) => true,
-            (CustomsStatus.DutyAssessed, CustomsStatus.ClearanceReview) => true, // if no payment required
+            (CustomsStatus.DutyAssessed, CustomsStatus.ClearanceReview) => true, // if no payment required (e.g. exempt)
             (CustomsStatus.PaymentPending, CustomsStatus.PaymentConfirmed) => true,
             (CustomsStatus.PaymentConfirmed, CustomsStatus.ClearanceReview) => true,
             (CustomsStatus.ClearanceReview, CustomsStatus.Cleared) => true,
             (CustomsStatus.ClearanceReview, CustomsStatus.Rejected) => true,
             (CustomsStatus.Cleared, CustomsStatus.ReleaseAuthorized) => true,
             (CustomsStatus.ReleaseAuthorized, CustomsStatus.Released) => true,
+            // Allow hold from any active processing state
+            (CustomsStatus.Assessment, CustomsStatus.Held) => true,
+            (CustomsStatus.PaymentPending, CustomsStatus.Held) => true,
+            (CustomsStatus.ClearanceReview, CustomsStatus.Held) => true,
             _ => false
         };
     }
 
     public void EnforceTransitionRules(CustomsCase customsCase, CustomsStatus targetStatus)
     {
-        if (!CanTransition(customsCase.Status, targetStatus))
+        if (!Enum.TryParse<CustomsStatus>(customsCase.Status, true, out var currentStatus))
         {
-            throw new InvalidOperationException($"Invalid state transition from {customsCase.Status} to {targetStatus}");
+            throw new InvalidOperationException($"Invalid or unrecognized current status: '{customsCase.Status}'");
+        }
+
+        if (!CanTransition(currentStatus, targetStatus))
+        {
+            throw new InvalidOperationException($"Invalid state transition from {currentStatus} to {targetStatus}");
         }
     }
 }

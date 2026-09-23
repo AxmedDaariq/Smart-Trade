@@ -1,0 +1,24 @@
+{
+  "name": "smart-trade-logistics-tests",
+  "version": "1.0.0",
+  "description": "Backend Unit & Database Integration Tests with Jest",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose",
+    "test:unit": "jest --testPathPattern=tests/unit --verbose",
+    "test:db": "jest --testPathPattern=tests/database --verbose",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.0",
+    "@types/pg": "^8.11.0",
+    "ioredis": "^5.3.2",
+    "jest": "^29.7.0",
+    "mongodb": "^6.3.0",
+    "pg": "^8.11.3",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
