@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: smart-trade-project
+  namespace: argocd
+spec:
+  description: "Enterprise GitOps project for Smart Trade Logistics Platform"
+  
+  # Allow deploying only to the local cluster
+  destinations:
+  - namespace: '*'
+    server: https://kubernetes.default.svc
+    
+  # Allow deploying resources from this specific GitHub repository
+  sourceRepos:
+  - 'https://github.com/your-org/smart-trade-logistics-platform.git'
+  
+  # Ensure namespace creation is allowed
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: Namespace
+  - group: '*'
+    kind: ClusterRole
+  - group: '*'
+    kind: ClusterRoleBinding

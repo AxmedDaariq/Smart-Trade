@@ -1,0 +1,16 @@
+# Production values for Identity API
+image:
+  repository: smart-trade/identity-api
+  tag: "v1.1.0"
+
+replicaCount: 2
+
+ingress:
+  enabled: true
+  host: "api.smart-trade.com"
+  path: "/auth"
+
+env:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  Jwt__Key: "your-super-secret-jwt-key"
+  Jwt__Issuer: "smart-trade.com"

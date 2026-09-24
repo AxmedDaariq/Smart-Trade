@@ -1,0 +1,28 @@
+# Enterprise HA deployment for ArgoCD
+redis-ha:
+  enabled: true
+
+controller:
+  replicas: 2
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+server:
+  replicas: 2
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - argocd.smart-trade.com
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+repoServer:
+  replicas: 2
+
+applicationSet:
+  replicas: 2

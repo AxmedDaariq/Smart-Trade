@@ -1,0 +1,20 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "smart-trade-service.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "smart-trade-service.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    # Astaantan (label) waxay u sheegaysaa Prometheus inuu raadiyo ServiceMonitor-kan
+    release: prometheus 
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "smart-trade-service.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - port: http
+      path: {{ .Values.metrics.path | default "/metrics" }}
+      interval: 15s
+{{- end }}

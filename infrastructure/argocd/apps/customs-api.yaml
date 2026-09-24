@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: customs-api
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: smart-trade-project
+  source:
+    repoURL: 'https://github.com/your-org/smart-trade-logistics-platform.git'
+    # Wuxuu tixraacayaa Helm chart-kii aan hore u dhisnay
+    path: infrastructure/helm/smart-trade-service
+    targetRevision: HEAD
+    helm:
+      # Wuxuu isticmaalayaa values-ka u gaarka ah Customs API
+      valueFiles:
+      - ../environments/production/values-customs.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

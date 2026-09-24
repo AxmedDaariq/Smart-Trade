@@ -1,0 +1,40 @@
+# Tusaalaha Dockerfile ee loogu talagalay adeegyada C# / .NET (Sida: Customs, Ectn, Identity)
+
+# 1. Qaybta Dhismaha (Build Stage)
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+WORKDIR /src
+
+# Nuqul ka samee faylalka mashruuca si aad u soo celiso dependencies-ka
+COPY ["services/customs/Customs.API/Customs.API.csproj", "services/customs/Customs.API/"]
+# Haddii aad leedahay mashaariic kale oo ku xiran (sida Customs.Domain), halkan ku dar:
+# COPY ["services/customs/Customs.Domain/Customs.Domain.csproj", "services/customs/Customs.Domain/"]
+
+RUN dotnet restore "services/customs/Customs.API/Customs.API.csproj"
+
+# Hada nuqul ka samee koodhka haray oo dhameystir dhisidda
+COPY . .
+WORKDIR "/src/services/customs/Customs.API"
+RUN dotnet build "Customs.API.csproj" -c Release -o /app/build
+
+# 2. Qaybta Daabacaada (Publish Stage) - Waxaan ku darnay Trimming si loo yareeyo size-ka
+FROM build AS publish
+RUN dotnet publish "Customs.API.csproj" -c Release -o /app/publish \
+    /p:UseAppHost=false \
+    /p:PublishTrimmed=true \
+    /p:TrimMode=partial
+
+# 3. Qaybta Orodka (Run Stage - Production - Waxaan u bedelnay Alpine)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+
+# Siyaado Ammaan (Non-root user)
+RUN adduser -D -u 1000 appuser
+USER appuser
+
+# Soo koobi koodhka la daabacay ee ka yimid qaybta publish
+COPY --chown=appuser:appuser --from=publish /app/publish .
+
+# U deji barta bilawga (Entry point)
+ENTRYPOINT ["dotnet", "Customs.API.dll"]

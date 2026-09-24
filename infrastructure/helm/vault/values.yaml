@@ -1,0 +1,49 @@
+global:
+  enabled: true
+  tlsDisable: false
+
+server:
+  # Enterprise HA Deployment using Raft Consensus Algorithm
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      setNodeId: true
+      config: |
+        ui = true
+        listener "tcp" {
+          tls_disable = 1 # Nolosha dhabta ah kani waa inuu yahay 0 oo TLS la isticmaalo
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+        storage "raft" {
+          path = "/vault/data"
+        }
+        disable_mlock = true
+  
+  # Kordhinta qiyaasta memory-ga ee Node kasta
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+  # Oggolow UI-ga si loo galo browser-ka
+  ui:
+    enabled: true
+
+# Tani waa qaybta ugu muhiimsan - Waxay u ogolaanaysaa in siraha
+# si toos ah (automatically) loogu dhex duro (inject) Pods-ka
+injector:
+  enabled: true
+  replicas: 2
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 250m

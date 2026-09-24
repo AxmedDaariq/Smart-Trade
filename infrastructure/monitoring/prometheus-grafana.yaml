@@ -1,0 +1,12 @@
+# Tusaale ku saabsan sida loo rakibo Prometheus iyo Grafana iyadoo la adeegsanayo Helm
+# Kani waa manifest file tusaale ah. Nolosha dhabta ah waxaad isticmaali doontaa:
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+# helm repo update
+# helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+# Xogta inteeda kale waxay u baahan tahay Helm Charts si loo hubiyo isku xirnaanta.

@@ -1,0 +1,43 @@
+replicaCount: 2
+
+image:
+  repository: your-docker-registry/smart-trade
+  pullPolicy: Always
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "api.smart-trade.local"
+  path: "/"
+  pathType: Prefix
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env: {}
+  # ASPNETCORE_ENVIRONMENT: "Production"
+
+metrics:
+  enabled: true
+  path: "/metrics"
+
+vault:
+  enabled: false
+  role: "app-role"
+  secretPath: "secret/data/my-service"
+  template: |
+    {{- with secret "secret/data/my-service" -}}
+    export DATABASE_URL="{{ .Data.data.database_url }}"
+    export API_KEY="{{ .Data.data.api_key }}"
+    {{- end -}}
+

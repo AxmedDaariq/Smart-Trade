@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customs-api-deployment
+  namespace: default
+  labels:
+    app: customs-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: customs-api
+  template:
+    metadata:
+      labels:
+        app: customs-api
+    spec:
+      containers:
+      - name: customs-api
+        image: smart-trade-customs:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: customs-api-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10

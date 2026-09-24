@@ -1,0 +1,29 @@
+# Tusaalaha Dockerfile ee loogu talagalay Frontend-ka ama adeegyada Node.js / TypeScript
+
+# 1. Qaybta Dhismaha (Build Stage)
+FROM node:18-alpine AS build
+WORKDIR /app
+
+# Nuqul ka samee faylalka package.json si aad u soo dejiso dependencies
+COPY package*.json ./
+RUN npm install
+
+# Nuqul ka samee koodhka haray
+COPY . .
+
+# Dhis application-ka (tusaale ahaan, React, Vue, ama Vite build)
+RUN npm run build
+
+# 2. Qaybta Orodka (Run Stage - NGINX Server)
+FROM nginx:alpine AS final
+
+# Ka soo qaado faylalka la dhisay qaybta sare
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# (Ikhtiyaari) Haddii aad leedahay nginx.conf u gaar ah:
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+# Daar Nginx
+CMD ["nginx", "-g", "daemon off;"]

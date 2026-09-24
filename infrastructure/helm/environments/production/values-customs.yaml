@@ -1,0 +1,15 @@
+# Production values for Customs API
+image:
+  repository: smart-trade/customs-api
+  tag: "v1.2.0"
+
+replicaCount: 3
+
+ingress:
+  enabled: true
+  host: "api.smart-trade.com"
+  path: "/customs"
+
+env:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ConnectionStrings__DefaultConnection: "Server=tcp:prod-db.smart-trade.com;Database=CustomsDB;User Id=dbuser;Password=dbpass;"

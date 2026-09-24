@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: customs-api-config
+  namespace: default
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ConnectionStrings__DefaultConnection: "Server=tcp:sqlserver;Database=CustomsDB;User Id=sa;Password=Your_password123;"
+  # Waxaad halkan ku dari kartaa Configuration-ka kale sida URLs

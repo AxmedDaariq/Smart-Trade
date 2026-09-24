@@ -156,3 +156,14 @@ temp/
 *.bak
 *.swp
 *~
+
+# ==============================================================================
+# Terraform & DevSecOps
+# ==============================================================================
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+.trivycache/
+checkov_report.json
+*.tfvars
