@@ -18,16 +18,21 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore all projects
+        run: |
+          find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' | \
+          xargs -I {} dotnet restore {}
 
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
+      - name: Build all projects
+        run: |
+          find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' | \
+          xargs -I {} dotnet build {} --no-restore --configuration Release
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
+        continue-on-error: true   # Iska dhaaf haddii SONAR_TOKEN aadan gelin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -36,8 +41,10 @@ jobs:
             -Dsonar.projectKey=smart-trade-platform
             -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
 
-      - name: Test
-        run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      - name: Test all projects
+        run: |
+          find . -name '*.csproj' -path '*/tests/*' -not -path '*/obj/*' | \
+          xargs -I {} dotnet test {} --no-build --verbosity normal --collect:"XPlat Code Coverage"
 
   docker-build-push:
     needs: build-and-test
