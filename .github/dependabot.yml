@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Baara oo si otomaatig ah u saxaya (update) package-yada .NET / NuGet
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Baara oo saxaya Docker images-ka (waxaa ku caawinayaa Trivy)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Baara GitHub Actions haddii ay duqoobeen
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -32,7 +32,6 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
-        continue-on-error: true   # Iska dhaaf haddii SONAR_TOKEN aadan gelin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -126,8 +125,23 @@ jobs:
           kubectl apply -f ./k8s/deployment.yaml
           kubectl apply -f ./infrastructure/monitoring/prometheus-grafana.yaml
 
+  owasp-zap-scan:
+    needs: kubernetes-deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          # Baddal tusaalahan oo ku qor URL-ka saxda ah ee website-kaaga
+          target: 'http://<YOUR_DEPLOYED_APP_URL>' 
+          fail_action: true # Wuxuu fashilinayaa pipeline-ka haddii la helo cilad amni
+
   notify-slack:
-    needs: [build-and-test, docker-build-push, terraform-deploy, kubernetes-deploy]
+    needs: [build-and-test, docker-build-push, terraform-deploy, kubernetes-deploy, owasp-zap-scan]
     runs-on: ubuntu-latest
     if: always()
     steps:
