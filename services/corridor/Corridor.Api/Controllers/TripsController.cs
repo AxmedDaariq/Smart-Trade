@@ -23,11 +23,9 @@ public class TripsController : ControllerBase
     [Authorize(Policy = "corridor.trip.manage")]
     public async Task<IActionResult> DetectDeviation(Guid tripId, [FromBody] DetectRouteDeviationCommand command)
     {
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
-        
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId)) return Forbid();
+        command.TenantId = tenantId;
+
         command.TripId = tripId;
 
         var deviated = await _mediator.Send(command);

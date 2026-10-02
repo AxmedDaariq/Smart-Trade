@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BuildingBlocks.Web;
 using MediatR;
 using FluentValidation;
 using Declaration.Application.Commands;
@@ -16,12 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://identity-service"; 
-        options.Audience = "declaration-api";
-    });
+builder.Services.AddPlatformJwtAuthentication(builder.Configuration);
 
 builder.Services.AddAuthorization(options =>
 {
@@ -33,11 +28,15 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("declaration.reject", policy => policy.RequireClaim("permissions", "declaration.reject"));
 });
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException("ConnectionStrings:DefaultConnection is required.");
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateDeclarationCommand).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(CreateDeclarationCommandValidator).Assembly);
 
 builder.Services.AddDbContext<DeclarationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<ICustomsDeclarationRepository, CustomsDeclarationRepository>();
 builder.Services.AddHttpClient<IEctnServiceClient, EctnServiceClient>();
@@ -52,6 +51,17 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/health/live", () => "Alive");
-app.MapGet("/health/ready", () => "Ready");
+app.MapGet("/health/ready", async (DeclarationDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        if (await db.Database.CanConnectAsync(ct)) return (IResult)Results.Ok(new { status = "ready" });
+        return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+    catch
+    {
+        return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+});
 
 app.Run();

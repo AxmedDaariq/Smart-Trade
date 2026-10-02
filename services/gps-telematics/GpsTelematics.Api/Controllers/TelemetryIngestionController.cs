@@ -19,21 +19,13 @@ public class TelemetryIngestionController : ControllerBase
     }
 
     [HttpPost]
-    // Note: In production, this would use a specialized scheme for Device Token / Client Certificate auth
-    // rather than standard user JWTs. We simulate standard auth here for demonstration.
-    [Authorize] 
+    [Authorize(Policy = "gps.device.ingest")]
     public async Task<IActionResult> IngestTelemetry([FromBody] IngestTelemetryCommand command)
     {
-        // For security, TenantId and DeviceId should be extracted from the authenticated device token
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
-        
-        if (User.HasClaim(c => c.Type == "deviceId"))
-        {
-            command.DeviceId = Guid.Parse(User.FindFirst("deviceId").Value);
-        }
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId) ||
+            !Guid.TryParse(User.FindFirst("device_id")?.Value, out var deviceId)) return Forbid();
+        command.TenantId = tenantId;
+        command.DeviceId = deviceId;
 
         var positionId = await _mediator.Send(command);
         return Accepted(new { PositionId = positionId, Status = "Processed" });

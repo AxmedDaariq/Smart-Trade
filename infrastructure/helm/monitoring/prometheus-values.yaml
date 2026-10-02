@@ -1,6 +1,9 @@
 grafana:
   enabled: true
-  adminPassword: "admin_password_here" # Ku beddel password xoogan
+  admin:
+    existingSecret: grafana-admin-credentials
+    userKey: admin-user
+    passwordKey: admin-password
   ingress:
     enabled: true
     ingressClassName: nginx

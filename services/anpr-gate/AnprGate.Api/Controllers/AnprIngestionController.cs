@@ -24,11 +24,10 @@ public class AnprIngestionController : ControllerBase
     [Authorize(Policy = "anpr.camera.machine")]
     public async Task<IActionResult> Ingest([FromBody] IngestRecognitionCommand command)
     {
-        // Determine TenantId from authenticated camera context, NEVER from payload
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId) ||
+            !Guid.TryParse(User.FindFirst("camera_id")?.Value, out var cameraId)) return Forbid();
+        command.TenantId = tenantId;
+        command.CameraId = cameraId;
 
         var recognitionId = await _mediator.Send(command);
         return Accepted(new { RecognitionEventId = recognitionId, Status = "Processing" });

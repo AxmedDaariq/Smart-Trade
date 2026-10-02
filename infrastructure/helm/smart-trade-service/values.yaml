@@ -9,6 +9,8 @@ service:
   type: ClusterIP
   port: 80
 
+containerPort: 8080
+
 ingress:
   enabled: true
   className: "nginx"
@@ -27,6 +29,8 @@ resources:
 env: {}
   # ASPNETCORE_ENVIRONMENT: "Production"
 
+secretEnv: []
+
 metrics:
   enabled: true
   path: "/metrics"
@@ -40,4 +44,3 @@ vault:
     export DATABASE_URL="{{ .Data.data.database_url }}"
     export API_KEY="{{ .Data.data.api_key }}"
     {{- end -}}
-

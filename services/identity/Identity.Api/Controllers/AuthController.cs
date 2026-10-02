@@ -1,39 +1,91 @@
 using Identity.Application.Commands.Auth;
+using Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Identity.Api.Controllers;
 
 [ApiController]
-[Route("api/v1/identity/[controller]")]
-public class AuthController : ControllerBase
+[Route("api/v1/identity/auth")]
+public sealed class AuthController : ControllerBase
 {
-    // In a real app, inject MediatR or a Command handler here
-    
+    private const string RefreshCookieName = "smarttrade_refresh";
+    private const string RefreshCookiePath = "/api/v1/identity/auth";
+    private readonly IIdentityAuthService _authService;
+
+    public AuthController(IIdentityAuthService authService) => _authService = authService;
+
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginCommand command)
+    [EnableRateLimiting("identity-auth")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken cancellationToken)
     {
-        // 1. Validate credentials
-        // 2. Check Lockout & MFA
-        // 3. Generate tokens
-        // 4. Return LoginResult
-        
-        return Ok(new { Message = "Login endpoint scaffolded successfully for Phase 02" });
+        var result = await _authService.LoginAsync(command, ClientIpAddress(), Request.Headers["User-Agent"].ToString(), cancellationToken);
+        if (result is null) return Unauthorized(new { error = "Invalid credentials or account unavailable." });
+        if (result.RequiresMfa)
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "MFA challenge is required.", requiresMfa = true });
+
+        SetRefreshCookie(result.RefreshToken);
+        return Ok(ToResponse(result));
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshToken([FromBody] object refreshRequest)
+    [EnableRateLimiting("identity-auth")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
     {
-        // 1. Validate refresh token
-        // 2. Check for token reuse (if reused -> revoke family)
-        // 3. Issue new tokens
-        
-        return Ok(new { Message = "Refresh endpoint scaffolded successfully" });
+        if (!Request.Cookies.TryGetValue(RefreshCookieName, out var refreshToken)) return Unauthorized();
+        var result = await _authService.RefreshAsync(refreshToken, ClientIpAddress(), Request.Headers["User-Agent"].ToString(), cancellationToken);
+        if (result is null)
+        {
+            ClearRefreshCookie();
+            return Unauthorized();
+        }
+        SetRefreshCookie(result.RefreshToken);
+        return Ok(ToResponse(result));
+    }
+
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    {
+        if (Request.Cookies.TryGetValue(RefreshCookieName, out var refreshToken))
+            await _authService.RevokeRefreshTokenAsync(refreshToken, cancellationToken);
+        ClearRefreshCookie();
+        return NoContent();
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([FromBody] object forgotPasswordRequest)
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public IActionResult ForgotPassword() =>
+        StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Password recovery is not configured." });
+
+    private static LoginResponse ToResponse(LoginResult result) => new(
+        result.AccessToken, result.ExpiresAtUtc, result.TenantType, result.Roles, result.Permissions, result.TenantCode);
+
+    private void SetRefreshCookie(string token) => Response.Cookies.Append(RefreshCookieName, token, new CookieOptions
     {
-        // Must return 200 OK regardless of whether email exists (prevent enumeration)
-        return Ok(); 
-    }
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Strict,
+        Path = RefreshCookiePath,
+        IsEssential = true,
+        MaxAge = TimeSpan.FromDays(30)
+    });
+
+    private void ClearRefreshCookie() => Response.Cookies.Delete(RefreshCookieName, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Strict,
+        Path = RefreshCookiePath,
+        IsEssential = true
+    });
+
+    private string ClientIpAddress() => HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+    public sealed record LoginResponse(string AccessToken, DateTime ExpiresAtUtc, string TenantType,
+        IReadOnlyList<string> Roles, IReadOnlyList<string> Permissions, string TenantCode);
 }

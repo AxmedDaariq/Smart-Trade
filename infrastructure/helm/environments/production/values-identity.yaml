@@ -8,9 +8,22 @@ replicaCount: 2
 ingress:
   enabled: true
   host: "api.smart-trade.com"
-  path: "/auth"
+  path: "/api/v1/identity"
 
 env:
   ASPNETCORE_ENVIRONMENT: "Production"
-  Jwt__Key: "your-super-secret-jwt-key"
   Jwt__Issuer: "smart-trade.com"
+  Jwt__Audience: "smart-trade-services"
+
+# Provision this Kubernetes Secret out of band through Vault or the cluster secret manager.
+secretEnv:
+  - name: Jwt__Secret
+    valueFrom:
+      secretKeyRef:
+        name: identity-api-secrets
+        key: jwt-secret
+  - name: ConnectionStrings__DefaultConnection
+    valueFrom:
+      secretKeyRef:
+        name: identity-api-secrets
+        key: default-connection

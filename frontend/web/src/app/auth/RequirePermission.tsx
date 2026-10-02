@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 interface RequirePermissionProps {
   children: JSX.Element;
@@ -8,43 +9,29 @@ interface RequirePermissionProps {
   requiredTenantAccess?: string;
 }
 
-// Mock auth hook for scaffolding
-const useAuth = () => {
-  return {
-    isAuthenticated: true,
-    user: {
-      roles: ['CUSTOMS_OFFICER'],
-      permissions: ['customs.configuration.read'],
-      tenantType: 'GOVERNMENT',
-    },
-    isLoading: false,
-  };
-};
-
 export const RequirePermission: React.FC<RequirePermissionProps> = ({
   children,
   requiredPermission,
   requiredRole,
   requiredTenantAccess,
 }) => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { session, isInitializing } = useAuth();
   const location = useLocation();
 
-  if (isLoading) return <div>Loading session...</div>;
-
-  if (!isAuthenticated) {
+  if (isInitializing) return <div role="status">Restoring session…</div>;
+  if (!session) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requiredRole && !user.roles.includes(requiredRole)) {
+  if (requiredRole && !session.roles.includes(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  if (requiredPermission && !user.permissions.includes(requiredPermission)) {
+  if (requiredPermission && !session.permissions.includes(requiredPermission)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  if (requiredTenantAccess && user.tenantType !== requiredTenantAccess) {
+  if (requiredTenantAccess && session.tenantType !== requiredTenantAccess) {
     return <Navigate to="/unauthorized" replace />;
   }
 

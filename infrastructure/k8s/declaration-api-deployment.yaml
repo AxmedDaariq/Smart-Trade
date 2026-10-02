@@ -24,6 +24,20 @@ spec:
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
+        - name: Jwt__Secret
+          valueFrom:
+            secretKeyRef:
+              name: identity-api-secrets
+              key: jwt-secret
+        - name: Jwt__Issuer
+          value: "smart-trade.com"
+        - name: Jwt__Audience
+          value: "smart-trade-services"
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: declaration-api-secrets
+              key: default-connection
         resources:
           requests:
             memory: "256Mi"

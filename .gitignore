@@ -167,3 +167,4 @@ temp/
 .trivycache/
 checkov_report.json
 *.tfvars
+.aider*

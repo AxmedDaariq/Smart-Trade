@@ -5,24 +5,18 @@ namespace Identity.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/identity/[controller]")]
-// [Authorize(Policy = "RequirePlatformAdmin")] // Protect this in real implementation
+[Authorize]
 public class TenantsController : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetTenants()
-    {
-        return Ok(new { Message = "Tenants retrieved successfully" });
-    }
+    [Authorize(Policy = "identity.tenants.read")]
+    public IActionResult GetTenants() => Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Tenant listing is not implemented.");
 
     [HttpPost]
-    public async Task<IActionResult> CreateTenant([FromBody] object command)
-    {
-        return Ok(new { Message = "Tenant created successfully" });
-    }
+    [Authorize(Policy = "identity.tenants.manage")]
+    public IActionResult CreateTenant() => Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Tenant creation is not implemented.");
 
     [HttpPost("{id}/suspend")]
-    public async Task<IActionResult> SuspendTenant(Guid id)
-    {
-        return Ok(new { Message = $"Tenant {id} suspended" });
-    }
+    [Authorize(Policy = "identity.tenants.manage")]
+    public IActionResult SuspendTenant(Guid id) => Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Tenant management is not implemented.");
 }

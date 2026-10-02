@@ -23,10 +23,8 @@ public class DispatchesController : ControllerBase
     [Authorize(Policy = "fleet.dispatch.create")]
     public async Task<IActionResult> CreateDispatch([FromBody] CreateDispatchCommand command)
     {
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId)) return Forbid();
+        command.TenantId = tenantId;
 
         var dispatchId = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetDispatch), new { id = dispatchId }, new { DispatchId = dispatchId });
@@ -36,6 +34,6 @@ public class DispatchesController : ControllerBase
     [Authorize(Policy = "fleet.dispatch.read")]
     public async Task<IActionResult> GetDispatch(Guid id)
     {
-        return Ok(new { Id = id, Status = "Draft" });
+        return Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Dispatch lookup is not implemented.");
     }
 }

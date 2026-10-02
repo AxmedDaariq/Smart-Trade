@@ -3,15 +3,13 @@ kind: Ingress
 metadata:
   name: smart-trade-ingress
   namespace: default
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
   - host: api.smart-trade.local
     http:
       paths:
-      - path: /customs
+      - path: /api/v1/CustomsCases
         pathType: Prefix
         backend:
           service:
