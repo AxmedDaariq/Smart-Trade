@@ -4,7 +4,7 @@ using BuildingBlocks.Persistence;
 
 namespace Fleet.Infrastructure.Persistence;
 
-public class FleetDbContext : SmartDbContext
+public class FleetDbContext : SmartDbContext<FleetDbContext>
 {
     public FleetDbContext(DbContextOptions<FleetDbContext> options) : base(options) { }
 

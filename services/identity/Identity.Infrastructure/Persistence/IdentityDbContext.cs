@@ -4,7 +4,7 @@ using BuildingBlocks.Persistence; // Ensure SmartDbContext is accessible
 
 namespace Identity.Infrastructure.Persistence;
 
-public class IdentityDbContext : SmartDbContext
+public class IdentityDbContext : SmartDbContext<IdentityDbContext>
 {
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
     {

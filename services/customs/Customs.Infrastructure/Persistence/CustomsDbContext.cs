@@ -6,7 +6,7 @@ using BuildingBlocks.Persistence; // Assuming SmartDbContext is located here
 
 namespace Customs.Infrastructure.Persistence;
 
-public class CustomsDbContext : SmartDbContext
+public class CustomsDbContext : SmartDbContext<CustomsDbContext>
 {
     public CustomsDbContext(DbContextOptions<CustomsDbContext> options) : base(options) { }
 

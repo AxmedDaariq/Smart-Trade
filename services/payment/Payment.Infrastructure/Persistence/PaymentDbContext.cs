@@ -7,7 +7,7 @@ using BuildingBlocks.Persistence; // Base SmartDbContext
 
 namespace Payment.Infrastructure.Persistence;
 
-public class PaymentDbContext : SmartDbContext
+public class PaymentDbContext : SmartDbContext<PaymentDbContext>
 {
     public PaymentDbContext(DbContextOptions<PaymentDbContext> options) : base(options) { }
 

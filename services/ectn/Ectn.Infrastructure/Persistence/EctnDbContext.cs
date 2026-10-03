@@ -4,7 +4,7 @@ using BuildingBlocks.Persistence; // Ensure SmartDbContext is accessible
 
 namespace Ectn.Infrastructure.Persistence;
 
-public class EctnDbContext : SmartDbContext
+public class EctnDbContext : SmartDbContext<EctnDbContext>
 {
     public EctnDbContext(DbContextOptions<EctnDbContext> options) : base(options) { }
 
