@@ -2,8 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using GpsTelematics.Application.Interfaces;
 using GpsTelematics.Domain.Entities;
-using GpsTelematics.Infrastructure.Persistence;
 
 namespace GpsTelematics.Application.Commands;
 
@@ -23,32 +23,33 @@ public class IngestTelemetryCommand : IRequest<Guid>
 
 public class IngestTelemetryCommandHandler : IRequestHandler<IngestTelemetryCommand, Guid>
 {
-    private readonly GpsDbContext _context;
+    private readonly ITelemetryIngestionRepository _repository;
 
-    public IngestTelemetryCommandHandler(GpsDbContext context)
+    public IngestTelemetryCommandHandler(ITelemetryIngestionRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<Guid> Handle(IngestTelemetryCommand request, CancellationToken cancellationToken)
     {
-        var position = new GpsPosition(
-            request.TenantId,
-            request.DeviceId,
-            request.VehicleId,
-            request.Latitude,
-            request.Longitude,
-            request.Speed,
-            request.Heading,
-            request.RecordedAt,
-            request.SequenceNumber
-        );
+        var position = new GpsPosition
+        {
+            TenantId = request.TenantId,
+            GpsDeviceId = request.DeviceId,
+            Latitude = request.Latitude,
+            Longitude = request.Longitude,
+            SpeedKph = request.Speed,
+            HeadingDegrees = request.Heading,
+            TimestampUtc = request.RecordedAt,
+            SequenceNumber = request.SequenceNumber
+            // request.VehicleId is intentionally not mapped yet: the vehicle is only
+            // resolved once the device's active assignment is known, and the position
+            // row stores the resolved vehicle reference instead.
+        };
 
-        _context.Positions.Add(position);
-        
         // Logic to update LatestLocationCache (Redis) would go here
-        
-        await _context.SaveChangesAsync(cancellationToken);
+
+        await _repository.AddAsync(position, cancellationToken);
 
         return position.Id;
     }

@@ -1,0 +1,19 @@
+﻿  Determining projects to restore...
+  Restored C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\Integration.Domain.csproj (in 432 ms).
+  Restored C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\Integration.Contracts.csproj (in 432 ms).
+  Restored C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Application\Integration.Application.csproj (in 550 ms).
+  Restored C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Infrastructure\Integration.Infrastructure.csproj (in 557 ms).
+  Retrying 'FindPackagesByIdAsync' for source 'https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.mvc.newtonsoftjson/index.json'.
+  The HTTP request to 'GET https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.mvc.newtonsoftjson/index.json' has timed out after 100000ms.
+  Restored C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Api\Integration.Api.csproj (in 1.78 min).
+CSC : error CS2012: Cannot open 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\obj\Debug\net9.0\Integration.Contracts.dll' for writing -- The process cannot access the file 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\obj\Debug\net9.0\Integration.Contracts.dll' because it is being used by another process. [C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\Integration.Contracts.csproj]
+CSC : error CS2012: Cannot open 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\obj\Debug\net9.0\Integration.Domain.dll' for writing -- The process cannot access the file 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\obj\Debug\net9.0\Integration.Domain.dll' because it is being used by another process.; file may be locked by 'Microsoft Defender Antivirus Service' (5792) [C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\Integration.Domain.csproj]
+
+Build FAILED.
+
+CSC : error CS2012: Cannot open 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\obj\Debug\net9.0\Integration.Contracts.dll' for writing -- The process cannot access the file 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\obj\Debug\net9.0\Integration.Contracts.dll' because it is being used by another process. [C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Contracts\Integration.Contracts.csproj]
+CSC : error CS2012: Cannot open 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\obj\Debug\net9.0\Integration.Domain.dll' for writing -- The process cannot access the file 'C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\obj\Debug\net9.0\Integration.Domain.dll' because it is being used by another process.; file may be locked by 'Microsoft Defender Antivirus Service' (5792) [C:\Users\Tariq\.gemini\antigravity-ide\scratch\smart-trade-logistics-platform\services\integration\Integration.Domain\Integration.Domain.csproj]
+    0 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:01:51.79

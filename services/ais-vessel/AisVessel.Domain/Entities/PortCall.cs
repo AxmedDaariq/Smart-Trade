@@ -1,3 +1,5 @@
+using AisVessel.Domain.Enums;
+
 namespace AisVessel.Domain.Entities;
 
 public class PortCall
@@ -34,4 +36,14 @@ public class PortCall
     public Port Port { get; set; } = null!;
     public Vessel Vessel { get; set; } = null!;
     public Voyage? Voyage { get; set; }
+
+    /// <summary>
+    /// Moves the port call to the given lifecycle state. The status is stored as
+    /// the enum name so it matches the values already persisted as strings.
+    /// </summary>
+    public void AdvanceState(PortCallStatus status)
+    {
+        Status = status.ToString();
+        UpdatedAtUtc = DateTime.UtcNow;
+    }
 }

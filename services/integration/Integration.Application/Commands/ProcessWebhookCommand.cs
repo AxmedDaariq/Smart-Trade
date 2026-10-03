@@ -2,8 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Integration.Domain.Entities;
-using Integration.Infrastructure.Persistence;
 
 namespace Integration.Application.Commands;
 
@@ -18,14 +16,9 @@ public class ProcessWebhookCommand : IRequest<bool>
 
 public class ProcessWebhookCommandHandler : IRequestHandler<ProcessWebhookCommand, bool>
 {
-    private readonly IntegrationDbContext _context;
-    
-    // In a real application, we'd inject IExternalRequestSigner to verify the HMAC
-
-    public ProcessWebhookCommandHandler(IntegrationDbContext context)
-    {
-        _context = context;
-    }
+    // NB: Application must not reference Integration.Infrastructure. When inbox
+    // persistence is implemented it will be exposed through an Application-owned
+    // interface (implemented in Infrastructure), the same way the other services do it.
 
     public async Task<bool> Handle(ProcessWebhookCommand request, CancellationToken cancellationToken)
     {

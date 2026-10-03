@@ -81,7 +81,10 @@ public class DeclarationsController : ControllerBase
         return Ok(result);
     }
 
-    private bool TryGetActor(out Guid tenantId, out Guid userId) =>
-        Guid.TryParse(User.FindFirst("tenant_id")?.Value, out tenantId) &&
-        Guid.TryParse(User.FindFirst("sub")?.Value, out userId);
+    private bool TryGetActor(out Guid tenantId, out Guid userId)
+    {
+        var hasTenant = Guid.TryParse(User.FindFirst("tenant_id")?.Value, out tenantId);
+        var hasUser = Guid.TryParse(User.FindFirst("sub")?.Value, out userId);
+        return hasTenant && hasUser;
+    }
 }
