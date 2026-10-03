@@ -7,6 +7,24 @@ export default {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          jsx: 'react-jsx',
+        },
+        // Stub out import.meta so Vite-only code compiles under Jest
+        diagnostics: { ignoreCodes: ['TS151001'] },
+      },
+    ],
   },
+  globals: {
+    'import.meta': {
+      env: {
+        VITE_API_GATEWAY_URL: '/api/v1',
+      },
+    },
+  },
+  testPathPattern: '\\.test\\.(ts|tsx)$',
 };
+
