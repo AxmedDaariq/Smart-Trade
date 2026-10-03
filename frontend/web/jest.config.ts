@@ -25,6 +25,6 @@ export default {
       },
     },
   },
-  testPathPattern: '\\.test\\.(ts|tsx)$',
+
 };
 
