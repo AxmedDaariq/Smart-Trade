@@ -1,30 +1,20 @@
-export default {
-  preset: 'ts-jest',
+/** @type {import('jest').Config} */
+const config = {
   testEnvironment: 'jest-environment-jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+
   moduleNameMapper: {
+    // CSS modules
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    // Path alias
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        tsconfig: {
-          jsx: 'react-jsx',
-        },
-        // Stub out import.meta so Vite-only code compiles under Jest
-        diagnostics: { ignoreCodes: ['TS151001'] },
-      },
-    ],
-  },
-  globals: {
-    'import.meta': {
-      env: {
-        VITE_API_GATEWAY_URL: '/api/v1',
-      },
-    },
-  },
 
+  // babel-jest (CommonJS) + babel-plugin-transform-vite-meta-env handles both
+  // JSX/TS and Vite's `import.meta.env`, and restores jest.mock() hoisting.
+  transform: {
+    '^.+\\.(t|j)sx?$': 'babel-jest',
+  },
 };
 
+export default config;

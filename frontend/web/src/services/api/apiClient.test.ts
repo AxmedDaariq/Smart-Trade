@@ -1,7 +1,10 @@
 import axios from 'axios';
-import { setAccessToken, apiClient } from './apiClient';
+import { setAccessToken } from './apiClient';
 
 // ─── Mock axios entirely ──────────────────────────────────────────────────────
+// `create` and `default.create` reference the SAME mock function so both
+// `import axios from 'axios'` (esModule interop) and direct `.create` usage
+// resolve to the instance that apiClient.ts actually configures.
 jest.mock('axios', () => {
   const mockAxiosInstance = {
     interceptors: {
@@ -12,75 +15,78 @@ jest.mock('axios', () => {
     get: jest.fn(),
     defaults: { headers: { common: {} } },
   };
-  return {
-    create: jest.fn(() => mockAxiosInstance),
-    default: { create: jest.fn(() => mockAxiosInstance) },
-  };
+  const create = jest.fn(() => mockAxiosInstance);
+  return { create, default: { create } };
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-// Grab the interceptor callbacks registered by apiClient.ts
-const getRequestInterceptor = () => {
-  const mockInstance = (axios.create as jest.Mock).mock.results[0].value;
-  return (mockInstance.interceptors.request.use as jest.Mock).mock.calls[0][0] as (
-    config: Record<string, unknown>,
-  ) => Record<string, unknown>;
+// ─── Capture interceptor callbacks ONCE at module load ────────────────────────
+// apiClient.ts registers the interceptors when it is imported (above). We grab
+// the callbacks here, before any test runs, because jest.clearAllMocks() wipes
+// mock.calls/results between tests.
+const mockInstance = (axios.create as jest.Mock).mock.results[0].value as {
+  interceptors: {
+    request: { use: jest.Mock };
+    response: { use: jest.Mock };
+  };
 };
 
-const getResponseInterceptors = () => {
-  const mockInstance = (axios.create as jest.Mock).mock.results[0].value;
-  const [successFn, errorFn] = (mockInstance.interceptors.response.use as jest.Mock).mock
-    .calls[0] as [(r: unknown) => unknown, (e: unknown) => unknown];
-  return { successFn, errorFn };
-};
+const requestInterceptor = mockInstance.interceptors.request.use.mock.calls[0][0] as (
+  config: { headers: Record<string, string> },
+) => { headers: Record<string, string> };
+
+const [responseSuccess] = mockInstance.interceptors.response.use.mock.calls[0] as [
+  (response: unknown) => unknown,
+  (error: unknown) => unknown,
+];
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
-describe('apiClient — setAccessToken', () => {
-  afterEach(() => jest.clearAllMocks());
+describe('apiClient request interceptor', () => {
+  afterEach(() => setAccessToken(null)); // isolate the module-level token
 
-  it('should add Authorization header when access token is set', () => {
+  it('should add an Authorization header when an access token is set', () => {
     setAccessToken('my-token');
-    const requestInterceptor = getRequestInterceptor();
-    const mockConfig = { headers: { set: jest.fn() }, Authorization: undefined } as unknown as Record<string, unknown>;
-    const result = requestInterceptor(mockConfig) as { Authorization?: string };
-    expect(result.Authorization ?? (mockConfig as { headers: { Authorization?: string } }).headers.Authorization).toBeDefined();
+
+    const config = { headers: {} as Record<string, string> };
+    const result = requestInterceptor(config);
+
+    expect(result.headers.Authorization ?? config.headers.Authorization).toBe('Bearer my-token');
   });
 
-  it('should NOT add Authorization header when token is null', () => {
+  it('should NOT add an Authorization header when the token is null', () => {
     setAccessToken(null);
-    const requestInterceptor = getRequestInterceptor();
-    const mockConfig: Record<string, unknown> = { headers: {} };
-    const result = requestInterceptor(mockConfig) as Record<string, unknown>;
-    const headers = result.headers as Record<string, unknown>;
-    expect(headers['Authorization']).toBeUndefined();
+
+    const config = { headers: {} as Record<string, string> };
+    const result = requestInterceptor(config);
+
+    expect(result.headers.Authorization).toBeUndefined();
+  });
+
+  it('should overwrite a previously set token', () => {
+    setAccessToken('first-token');
+    setAccessToken('second-token');
+
+    const config = { headers: {} as Record<string, string> };
+    const result = requestInterceptor(config);
+
+    expect(result.headers.Authorization).toBe('Bearer second-token');
   });
 });
 
-describe('apiClient — response interceptor (success path)', () => {
+describe('apiClient response interceptor (success path)', () => {
   it('should pass through successful responses unchanged', () => {
-    const { successFn } = getResponseInterceptors();
     const fakeResponse = { status: 200, data: { ok: true } };
-    expect(successFn(fakeResponse)).toBe(fakeResponse);
+    expect(responseSuccess(fakeResponse)).toBe(fakeResponse);
   });
 });
 
 describe('setAccessToken', () => {
+  afterEach(() => setAccessToken(null));
+
   it('should be callable with a string token without throwing', () => {
     expect(() => setAccessToken('some-jwt')).not.toThrow();
   });
 
   it('should be callable with null without throwing', () => {
     expect(() => setAccessToken(null)).not.toThrow();
-  });
-
-  it('should overwrite a previously set token', () => {
-    setAccessToken('first-token');
-    setAccessToken('second-token');
-    // Verify by running the request interceptor — it should use the latest token
-    const requestInterceptor = getRequestInterceptor();
-    const mockConfig: Record<string, unknown> = { headers: {} };
-    requestInterceptor(mockConfig);
-    // No error means the interceptor ran successfully with the latest token
-    expect(true).toBe(true);
   });
 });

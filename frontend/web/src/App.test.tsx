@@ -38,10 +38,16 @@ beforeAll(async () => {
 describe('App routing', () => {
   afterEach(() => jest.restoreAllMocks());
 
+  // BrowserRouter mutates window.history, which persists between tests in the
+  // same file — reset it so each test starts from the root route.
+  beforeEach(() => {
+    window.history.pushState({}, '', '/');
+  });
+
   it('should render Sign in page at /login', async () => {
     mockUseAuth({ isInitializing: false, session: null });
     render(<App />);
-    expect(await screen.findByText('Sign in')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('should render 403 Forbidden page at /403', async () => {

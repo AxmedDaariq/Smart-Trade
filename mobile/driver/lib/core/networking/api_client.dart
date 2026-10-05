@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 
@@ -18,6 +19,12 @@ class ApiClient {
     _dio.interceptors.add(_createAuthInterceptor());
     _dio.interceptors.add(_createRetryInterceptor());
   }
+
+  /// The configured [Dio] instance, exposed for tests so they can attach a
+  /// mock [HttpClientAdapter] (http_mock_adapter) and observe the real
+  /// interceptor pipeline without a live backend.
+  @visibleForTesting
+  Dio get dio => _dio;
 
   Interceptor _createAuthInterceptor() {
     return InterceptorsWrapper(
