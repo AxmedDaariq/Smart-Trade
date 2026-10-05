@@ -1,16 +1,31 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Analytics.Application.Interfaces;
 using Analytics.Domain.Entities;
 
 namespace Analytics.Infrastructure.Persistence;
 
-public class AnalyticsDbContext : DbContext
+public class AnalyticsDbContext : DbContext, IAnalyticsDbContext
 {
-    public DbSet<DimTenant> DimTenants { get; set; }
-    public DbSet<FactTripMilestone> FactTripMilestones { get; set; }
-    public DbSet<KpiDefinition> KpiDefinitions { get; set; }
-    public DbSet<ReportDefinition> ReportDefinitions { get; set; }
+    public DbSet<DimTenant> DimTenants { get; set; } = null!;
+    public DbSet<FactTripMilestone> FactTripMilestones { get; set; } = null!;
+    public DbSet<KpiDefinition> KpiDefinitions { get; set; } = null!;
+    public DbSet<ReportDefinition> ReportDefinitions { get; set; } = null!;
 
     public AnalyticsDbContext(DbContextOptions<AnalyticsDbContext> options) : base(options) { }
+
+    // ── IAnalyticsDbContext (Application-layer abstraction) ───────────────────
+
+    public Task<ReportDefinition?> FindReportDefinitionAsync(Guid id, CancellationToken cancellationToken = default)
+        => ReportDefinitions.FindAsync(new object[] { id }, cancellationToken).AsTask();
+
+    public Task<bool> FactTripMilestoneExistsAsync(Guid sourceEventId, CancellationToken cancellationToken = default)
+        => FactTripMilestones.AnyAsync(f => f.SourceEventId == sourceEventId, cancellationToken);
+
+    public void AddFactTripMilestone(FactTripMilestone fact)
+        => FactTripMilestones.Add(fact);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

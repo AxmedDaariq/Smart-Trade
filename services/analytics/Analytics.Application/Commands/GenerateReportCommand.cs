@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Analytics.Infrastructure.Persistence;
+using Analytics.Application.Interfaces;
 
 namespace Analytics.Application.Commands;
 
@@ -14,9 +14,9 @@ public class GenerateReportCommand : IRequest<string> // Returns Signed URL of t
 
 public class GenerateReportCommandHandler : IRequestHandler<GenerateReportCommand, string>
 {
-    private readonly AnalyticsDbContext _context;
-    
-    public GenerateReportCommandHandler(AnalyticsDbContext context)
+    private readonly IAnalyticsDbContext _context;
+
+    public GenerateReportCommandHandler(IAnalyticsDbContext context)
     {
         _context = context;
     }
@@ -24,7 +24,7 @@ public class GenerateReportCommandHandler : IRequestHandler<GenerateReportComman
     public async Task<string> Handle(GenerateReportCommand request, CancellationToken cancellationToken)
     {
         // 1. Fetch ReportDefinition
-        var def = await _context.ReportDefinitions.FindAsync(new object[] { request.ReportDefinitionId }, cancellationToken);
+        var def = await _context.FindReportDefinitionAsync(request.ReportDefinitionId, cancellationToken);
         if (def == null) throw new Exception("Report Definition not found.");
         
         // 2. Validate Security (Tenant Isolation)
