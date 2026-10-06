@@ -4,6 +4,7 @@ using Identity.Domain.Entities;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 
@@ -18,14 +19,16 @@ public sealed class IdentityAuthService : IIdentityAuthService
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _tokens;
     private readonly JwtTokenOptions _jwtOptions;
+    private readonly ILogger<IdentityAuthService> _logger;
 
     public IdentityAuthService(IdentityDbContext db, IPasswordHasher passwordHasher, IJwtTokenGenerator tokens,
-        IOptions<JwtTokenOptions> jwtOptions)
+        IOptions<JwtTokenOptions> jwtOptions, ILogger<IdentityAuthService> logger)
     {
         _db = db;
         _passwordHasher = passwordHasher;
         _tokens = tokens;
         _jwtOptions = jwtOptions.Value;
+        _logger = logger;
     }
 
     public async Task<LoginResult?> LoginAsync(LoginCommand command, string ipAddress, string userAgent, CancellationToken cancellationToken)
@@ -40,28 +43,59 @@ public sealed class IdentityAuthService : IIdentityAuthService
         var passwordValid = _passwordHasher.VerifyPassword(command.Password, user?.PasswordHash ?? DummyPasswordHash);
         if (user is null || tenant is null || !passwordValid || tenant.Status != "Active" || user.Status != "Active")
         {
+            // A09: every rejected login attempt is a security event (audit trail + brute force detection).
+            // Neither the password nor any token material is ever logged.
+            _logger.LogWarning(
+                "Rejected login for {Email} on tenant {TenantCode} from {IpAddress} ({UserAgent}): {Reason}",
+                normalizedEmail, normalizedTenantCode, ipAddress, userAgent,
+                user is null ? "unknown user" :
+                tenant is null ? "unknown tenant" :
+                !passwordValid ? "invalid password" :
+                tenant.Status != "Active" ? "tenant inactive" : "user inactive");
+
             if (user is not null && !passwordValid)
             {
                 user.FailedLoginCount++;
                 user.LastFailedLoginAtUtc = DateTime.UtcNow;
                 if (user.FailedLoginCount >= MaximumFailedAttempts)
+                {
                     user.LockedUntilUtc = DateTime.UtcNow.Add(LockoutDuration);
+                    _logger.LogWarning(
+                        "Locked account {Email} for {Duration} after {Attempts} failed logins from {IpAddress}",
+                        normalizedEmail, LockoutDuration, user.FailedLoginCount, ipAddress);
+                }
                 await _db.SaveChangesAsync(cancellationToken);
             }
             return null;
         }
 
         var now = DateTime.UtcNow;
-        if (user.LockedUntilUtc > now) return null;
-        if (!user.EmailVerified) return null;
+        if (user.LockedUntilUtc > now)
+        {
+            _logger.LogWarning("Login blocked: account {Email} is locked until {LockedUntil} (source {IpAddress})",
+                normalizedEmail, user.LockedUntilUtc, ipAddress);
+            return null;
+        }
+        if (!user.EmailVerified)
+        {
+            _logger.LogWarning("Rejected login for {Email}: email address not verified (source {IpAddress})",
+                normalizedEmail, ipAddress);
+            return null;
+        }
         if (user.MfaEnabled)
+        {
+            _logger.LogInformation("MFA challenge issued for {Email} from {IpAddress}", normalizedEmail, ipAddress);
             return new LoginResult { RequiresMfa = true };
+        }
 
         user.FailedLoginCount = 0;
         user.LockedUntilUtc = null;
         user.LastLoginAtUtc = now;
         var authorization = await LoadAuthorizationAsync(user.Id, tenant.Id, cancellationToken);
-        return await CreateSessionAsync(user, tenant, authorization.Roles, authorization.Permissions, ipAddress, userAgent, now, cancellationToken);
+        var session = await CreateSessionAsync(user, tenant, authorization.Roles, authorization.Permissions, ipAddress, userAgent, now, cancellationToken);
+        _logger.LogInformation("Successful login for {Email} on tenant {TenantCode} from {IpAddress} ({UserAgent})",
+            normalizedEmail, normalizedTenantCode, ipAddress, userAgent);
+        return session;
     }
 
     public async Task<LoginResult?> RefreshAsync(string refreshToken, string ipAddress, string userAgent, CancellationToken cancellationToken)
@@ -78,6 +112,11 @@ public sealed class IdentityAuthService : IIdentityAuthService
         {
             if (current.UsedAtUtc is not null)
             {
+                // A09: refresh token replay means a stolen token is in circulation - revoke the
+                // whole session family and raise a high-severity security event.
+                _logger.LogError(
+                    "Refresh token reuse detected for user {UserId}; revoking session family {TokenFamilyId} from {IpAddress}",
+                    current.UserId, current.TokenFamilyId, ipAddress);
                 await RevokeFamilyAsync(current.TokenFamilyId, current.SessionId, now, "Refresh token reuse detected", cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
@@ -131,6 +170,7 @@ public sealed class IdentityAuthService : IIdentityAuthService
         if (token is null || token.RevokedAtUtc is not null) return;
         await RevokeFamilyAsync(token.TokenFamilyId, token.SessionId, DateTime.UtcNow, "User signed out", cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Session family {TokenFamilyId} revoked for user {UserId} (logout)", token.TokenFamilyId, token.UserId);
     }
 
     private async Task<LoginResult> CreateSessionAsync(User user, Tenant tenant, IReadOnlyList<string> roles,

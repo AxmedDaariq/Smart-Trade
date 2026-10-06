@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -32,7 +34,47 @@ public static class PlatformAuthenticationExtensions
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromSeconds(30)
                 };
+
+                // A09: record authentication failures, rejected authorizations and token errors so
+                // brute force and token misuse attempts are visible to monitoring. Token material is
+                // never logged.
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Log(context.HttpContext, LogLevel.Warning,
+                            "Token validation failed for {Method} {Path}: {Error}",
+                            context.HttpContext.Request.Method, context.HttpContext.Request.Path,
+                            context.Exception?.Message ?? "unknown error");
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = context =>
+                    {
+                        Log(context.HttpContext, LogLevel.Information,
+                            "Authentication challenge for {Method} {Path} from {RemoteIp}: {Reason}",
+                            context.HttpContext.Request.Method, context.HttpContext.Request.Path,
+                            context.HttpContext.Connection.RemoteIpAddress,
+                            context.ErrorDescription ?? "missing or invalid credentials");
+                        return Task.CompletedTask;
+                    },
+                    OnForbidden = context =>
+                    {
+                        Log(context.HttpContext, LogLevel.Information,
+                            "Access forbidden for user {User} on {Method} {Path}",
+                            context.HttpContext.User?.Identity?.Name ?? "anonymous",
+                            context.HttpContext.Request.Method, context.HttpContext.Request.Path);
+                        return Task.CompletedTask;
+                    }
+                };
             });
         return services;
+    }
+
+    private static void Log(HttpContext context, LogLevel level, string message, params object?[] args)
+    {
+        var logger = context.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("Platform.Authentication");
+        logger.Log(level, message, args);
     }
 }

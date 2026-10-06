@@ -1,9 +1,11 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Corridor.Application.Commands;
 using Corridor.Domain.Entities;
 
 namespace Corridor.Infrastructure.Persistence;
 
-public class CorridorDbContext : DbContext
+public class CorridorDbContext : DbContext, ICorridorDbContext
 {
     // 1. Corridor & Routes
     public DbSet<Domain.Entities.Corridor> Corridors { get; set; } = null!;
@@ -45,6 +47,10 @@ public class CorridorDbContext : DbContext
     public DbSet<IdempotencyRecord> IdempotencyRecords { get; set; } = null!;
 
     public CorridorDbContext(DbContextOptions<CorridorDbContext> options) : base(options) { }
+
+    // ── ICorridorDbContext (Application-layer abstraction) ───────────────────
+    IQueryable<Domain.Entities.Trip> ICorridorDbContext.Trips => Trips;
+    IQueryable<RouteVersion> ICorridorDbContext.RouteVersions => RouteVersions;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

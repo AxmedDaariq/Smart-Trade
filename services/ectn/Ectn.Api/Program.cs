@@ -23,6 +23,10 @@ builder.Services.AddDbContext<EctnDbContext>(options =>
 
 builder.Services.AddPlatformJwtAuthentication(builder.Configuration);
 
+// Platform-wide security defaults: deny-by-default fallback policy (A01), rate limiting (A07),
+// config-driven CORS, ProblemDetails exception handling and security headers (A05/A09).
+builder.Services.AddPlatformSecurity(builder.Configuration);
+
 // Configure Permission-Based Authorization
 builder.Services.AddAuthorization(options =>
 {
@@ -39,6 +43,7 @@ builder.Services.AddAuthorization(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UsePlatformSecurity();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -47,11 +52,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+app.UsePlatformCors();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGet("/health/live", () => Results.Ok(new { status = "alive" }));
+app.MapGet("/health/live", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
 app.MapGet("/health/ready", async (EctnDbContext db, CancellationToken ct) =>
 {
     try
@@ -63,6 +71,6 @@ app.MapGet("/health/ready", async (EctnDbContext db, CancellationToken ct) =>
     {
         return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
     }
-});
+}).AllowAnonymous();
 
 app.Run();

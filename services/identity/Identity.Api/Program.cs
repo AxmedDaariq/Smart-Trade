@@ -32,6 +32,10 @@ builder.Services.AddScoped<IIdentityAuthService, IdentityAuthService>();
 
 builder.Services.AddPlatformJwtAuthentication(builder.Configuration);
 
+// Platform-wide security defaults: deny-by-default fallback policy (A01), rate limiting (A07),
+// config-driven CORS, ProblemDetails exception handling and security headers (A05/A09).
+builder.Services.AddPlatformSecurity(builder.Configuration);
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("identity.users.read", policy => policy.RequireClaim("permissions", "identity.users.read"));
@@ -54,6 +58,7 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+app.UsePlatformSecurity();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -61,6 +66,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UsePlatformCors();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();

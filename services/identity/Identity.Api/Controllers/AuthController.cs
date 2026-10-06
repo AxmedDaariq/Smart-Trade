@@ -1,12 +1,17 @@
 using Identity.Application.Commands.Auth;
 using Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
+using BuildingBlocks.Web;
 
 namespace Identity.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/identity/auth")]
+// A01: authentication endpoints are the only anonymous surface of this service; every other
+// endpoint falls back to "authenticated user required".
+[AllowAnonymous]
 public sealed class AuthController : ControllerBase
 {
     private const string RefreshCookieName = "smarttrade_refresh";
@@ -48,6 +53,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
+    [EnableRateLimiting(PlatformSecurityExtensions.SensitiveRateLimitPolicy)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
@@ -58,6 +64,7 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
+    [EnableRateLimiting(PlatformSecurityExtensions.SensitiveRateLimitPolicy)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     public IActionResult ForgotPassword() =>
         StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Password recovery is not configured." });

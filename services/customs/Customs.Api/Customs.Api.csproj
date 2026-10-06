@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Customs.Application\Customs.Application.csproj" />
     <ProjectReference Include="..\Customs.Infrastructure\Customs.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\web\BuildingBlocks.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

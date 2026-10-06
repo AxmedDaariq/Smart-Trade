@@ -17,6 +17,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddPlatformJwtAuthentication(builder.Configuration);
 
+// Platform-wide security defaults: deny-by-default fallback policy (A01), rate limiting (A07),
+// config-driven CORS, ProblemDetails exception handling and security headers (A05/A09).
+builder.Services.AddPlatformSecurity(builder.Configuration);
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("gps.device.ingest", policy => policy.RequireClaim("permissions", "gps.device.ingest"));
@@ -34,14 +38,21 @@ builder.Services.AddScoped<ITelemetryIngestionRepository, TelemetryIngestionRepo
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UsePlatformSecurity();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UsePlatformCors();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/health/live", () => "Alive");
+app.MapGet("/health/live", () => "Alive").AllowAnonymous();
 app.MapGet("/health/ready", async (GpsDbContext db, CancellationToken ct) =>
 {
     try
@@ -53,7 +64,7 @@ app.MapGet("/health/ready", async (GpsDbContext db, CancellationToken ct) =>
     {
         return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
     }
-});
+}).AllowAnonymous();
 
 app.Run();
 
