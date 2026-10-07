@@ -52,7 +52,7 @@ public class HealthAndSecurityIntegrationTests
         Assert.Equal("no-referrer", response.Headers.GetValues("Referrer-Policy").First());
         Assert.Contains("camera=()", response.Headers.GetValues("Permissions-Policy").First());
         Assert.Equal("same-origin", response.Headers.GetValues("Cross-Origin-Opener-Policy").First());
-        Assert.DoesNotContain("X-Powered-By", response.Headers);
+        Assert.DoesNotContain("X-Powered-By", response.Headers.Select(h => h.Key));
     }
 
     // ── CORS (A05: opt-in, no AllowAnyOrigin) ─────────────────────

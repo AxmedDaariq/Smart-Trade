@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Identity.Api.IntegrationTests;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Api.IntegrationTests;
 
