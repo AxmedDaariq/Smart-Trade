@@ -13,8 +13,8 @@ consistently rather than per-service.
 | `building-blocks/web/PlatformExceptionHandler.cs` | Generic ProblemDetails responses; stack traces logged server-side only |
 | `building-blocks/web/PlatformUrlGuard.cs` | SSRF guard for caller-supplied URLs (A10) |
 
-All 12 API services (`ais-vessel`, `analytics`, `anpr-gate`, `corridor`, `customs`, `declaration`,
-`ectn`, `fleet`, `gps-telematics`, `identity`, `integration`, `payment`) call
+All 13 API services (`ais-vessel`, `analytics`, `anpr-gate`, `corridor`, `customs`, `declaration`,
+`ectn`, `fleet`, `gps-telematics`, `identity`, `integration`, `payment`, `shipping`) call
 `AddPlatformJwtAuthentication`, `AddPlatformSecurity` and `UsePlatformSecurity`.
 
 ## A01 — Broken Access Control
@@ -115,8 +115,13 @@ All 12 API services (`ais-vessel`, `analytics`, `anpr-gate`, `corridor`, `custom
 
 ## Verification
 
-- **Unit/integration tests**: 19 test projects (see `find . -name '*.csproj' | grep -Ei
-  'Tests\.csproj$'`).
+- **Unit/integration tests**: 20 test projects (see `find . -name '*.csproj' | grep -Ei
+  'Tests\.csproj$'`), including `Shipping.Api.IntegrationTests`, which boots the real
+  Shipping.Api pipeline with `WebApplicationFactory` against a PostgreSQL Testcontainer —
+  covering auth (401/403/401-tampered), tenant isolation (cross-tenant reads return 404),
+  the full shipment lifecycle (create → track → status → customs → deliver), generic
+  ProblemDetails on domain errors, and the database constraints (tenant-scoped unique
+  shipment number, unique line number) against real PostgreSQL. Requires a Docker daemon.
 - **Live smoke test**: `Fleet.Api` verified end-to-end — unauthenticated call returns `401` with
   `WWW-Authenticate: Bearer`, `/health/live` stays `200` anonymous, an unconfigured CORS origin gets
   no `Access-Control-Allow-*` headers, a valid JWT is accepted, and a tampered (bad-signature) JWT is

@@ -86,3 +86,7 @@ app.MapGet("/health/ready", async (IdentityDbContext db, CancellationToken ct) =
 }).AllowAnonymous();
 
 app.Run();
+
+// Integration tests use WebApplicationFactory<Program>, which requires the
+// entry-point class to be public (same pattern as the other API services).
+public partial class Program { }
