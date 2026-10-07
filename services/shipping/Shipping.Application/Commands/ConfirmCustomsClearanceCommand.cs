@@ -63,12 +63,12 @@ public class ConfirmCustomsClearanceCommandHandler : IRequestHandler<ConfirmCust
         shipment.UpdatedBy = request.UserId;
 
         shipment.TransitionStatus(
-            Enums.ShipmentStatus.CustomsCleared,
+            ShipmentStatus.CustomsCleared,
             $"Customs cleared — Case: {request.CustomsCaseNumber}",
             request.UserId);
 
         shipment.AddTrackingEvent(
-            Enums.TrackingEventType.CustomsCleared,
+            TrackingEventType.CustomsCleared,
             "Customs Authority",
             $"Customs clearance confirmed. Case: {request.CustomsCaseNumber}",
             request.UserId);
