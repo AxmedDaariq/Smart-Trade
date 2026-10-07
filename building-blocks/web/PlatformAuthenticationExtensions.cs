@@ -59,9 +59,16 @@ public static class PlatformAuthenticationExtensions
                     },
                     OnForbidden = context =>
                     {
+                        var user = context.HttpContext.User;
+                        // MapInboundClaims is disabled, so Identity.Name may be unset; fall back to
+                        // the raw subject claim so the audit entry still identifies the caller.
+                        var name = user?.Identity?.Name
+                            ?? user?.FindFirst("unique_name")?.Value
+                            ?? user?.FindFirst("sub")?.Value
+                            ?? "unknown";
                         Log(context.HttpContext, LogLevel.Information,
                             "Access forbidden for user {User} on {Method} {Path}",
-                            context.HttpContext.User?.Identity?.Name ?? "anonymous",
+                            name,
                             context.HttpContext.Request.Method, context.HttpContext.Request.Path);
                         return Task.CompletedTask;
                     }

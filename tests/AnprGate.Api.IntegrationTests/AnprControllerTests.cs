@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -7,11 +8,26 @@ using Xunit;
 
 namespace AnprGate.Api.IntegrationTests;
 
-public class AnprControllerTests : IClassFixture<WebApplicationFactory<Program>>
+/// <summary>
+/// Boots the real API pipeline. The service fails fast when no signing key is configured (A02),
+/// so the tests inject their own JWT configuration through environment variables - the only
+/// configuration source that is guaranteed to be visible while <c>Program.cs</c> runs.
+/// </summary>
+public sealed class AnprApiFactory : WebApplicationFactory<Program>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    public AnprApiFactory()
+    {
+        Environment.SetEnvironmentVariable("Jwt__Secret", "integration-test-signing-key-with-at-least-32-bytes!");
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "smart-trade-integration-tests");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "smart-trade-integration-tests");
+    }
+}
 
-    public AnprControllerTests(WebApplicationFactory<Program> factory)
+public class AnprControllerTests : IClassFixture<AnprApiFactory>
+{
+    private readonly AnprApiFactory _factory;
+
+    public AnprControllerTests(AnprApiFactory factory)
     {
         _factory = factory;
     }
@@ -40,8 +56,21 @@ public class AnprControllerTests : IClassFixture<WebApplicationFactory<Program>>
         var response = await client.GetAsync("/api/v1/anpr/ingest");
 
         // Assert: Endpoint-kani POST kaliya ayuu qaataa
-        Assert.True(response.StatusCode == HttpStatusCode.MethodNotAllowed || 
-                    response.StatusCode == HttpStatusCode.NotFound || 
+        Assert.True(response.StatusCode == HttpStatusCode.MethodNotAllowed ||
+                    response.StatusCode == HttpStatusCode.NotFound ||
                     response.StatusCode == HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task HealthLive_WithoutAuth_ShouldRemainReachable()
+    {
+        // Arrange: k8s probes must never depend on a token (A01 fallback policy exception)
+        var client = _factory.CreateClient();
+
+        // Act
+        var response = await client.GetAsync("/health/live");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }

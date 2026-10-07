@@ -8,15 +8,20 @@ on:
     branches:
       - main
 
+# A08/A05: least-privilege token. No job in this workflow writes to the repository, so every job
+# only ever receives read access to the checked out code.
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.4.0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4.3.1
         with:
           dotnet-version: '10.0.x'
 
@@ -30,8 +35,27 @@ jobs:
           find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' | \
           xargs -I {} dotnet build {} --no-restore --configuration Release
 
+      # A06 (Vulnerable and Outdated Components): fail the pipeline when a referenced NuGet
+      # package (directly or transitively) has a known High/Critical advisory.
+      - name: Dependency vulnerability gate (OWASP A06)
+        run: |
+          set -uo pipefail
+          report_file="${RUNNER_TEMP}/vulnerable-packages.txt"
+          : > "$report_file"
+          failed=0
+          while IFS= read -r project; do
+            echo "== $project" >> "$report_file"
+            dotnet list "$project" package --vulnerable --include-transitive --severity high \
+              >> "$report_file" 2>&1 || true
+          done < <(find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*')
+          cat "$report_file"
+          if grep -qi "The following packages have versions with known vulnerabilities" "$report_file"; then
+            echo "::error::High/Critical NuGet advisories detected (OWASP A06). Upgrade the affected packages."
+            exit 1
+          fi
+
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@v8.3.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -40,10 +64,14 @@ jobs:
             -Dsonar.projectKey=smart-trade-platform
             -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
 
+      # Runs every test project in the repo (services/**/X.Tests, tests/**, integration tests),
+      # not just those under a literal "tests" directory. --configuration must match the Release
+      # build above, otherwise --no-build finds no binaries.
       - name: Test all projects
         run: |
-          find . -name '*.csproj' -path '*/tests/*' -not -path '*/obj/*' | \
-          xargs -I {} dotnet test {} --no-build --verbosity normal --collect:"XPlat Code Coverage"
+          find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' \
+          | grep -Ei 'Tests\.csproj$' \
+          | xargs -I {} dotnet test {} --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
 
   docker-build-push:
     needs: build-and-test
@@ -51,10 +79,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.4.0
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3.7.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -63,7 +91,7 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/smart-trade-app:latest .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: '${{ secrets.DOCKER_USERNAME }}/smart-trade-app:latest'
           format: 'table'
@@ -81,10 +109,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.4.0
 
       - name: Run Checkov (IaC Security Scan)
-        uses: bridgecrewio/checkov-action@master
+        uses: bridgecrewio/checkov-action@v12.3130.0
         with:
           directory: infrastructure/
           framework: terraform,helm
@@ -92,7 +120,7 @@ jobs:
           quiet: true
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3.1.2
         with:
           terraform_version: 1.5.0
 
@@ -113,10 +141,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.4.0
 
       - name: Configure kubectl
-        uses: azure/k8s-set-context@v3
+        uses: azure/k8s-set-context@v3.1
         with:
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
@@ -131,13 +159,21 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.4.0
+
+      # A09: never let the DAST scan silently disappear - call out a missing target explicitly.
+      - name: Check ZAP scan target is configured
+        run: |
+          if [ -z "${{ vars.ZAP_TARGET }}" ]; then
+            echo "::warning::The ZAP_TARGET repository variable is not set, so the OWASP ZAP baseline scan is skipped."
+          fi
 
       - name: Run OWASP ZAP Baseline Scan
+        if: vars.ZAP_TARGET != ''
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          # Baddal tusaalahan oo ku qor URL-ka saxda ah ee website-kaaga
-          target: 'http://<YOUR_DEPLOYED_APP_URL>' 
+          # Set the ZAP_TARGET repository variable to the deployed URL to enable the DAST scan.
+          target: ${{ vars.ZAP_TARGET }}
           fail_action: true # Wuxuu fashilinayaa pipeline-ka haddii la helo cilad amni
 
   notify-slack:
@@ -146,7 +182,7 @@ jobs:
     if: always()
     steps:
       - name: Send Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@v2.4.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_CHANNEL: '#deployments'

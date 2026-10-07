@@ -183,10 +183,13 @@ infrastructure/
 ### .NET Services
 
 ```bash
-# Run all service tests
+# Run every test project (unit + integration) in one pass
+find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' \
+  | grep -Ei 'Tests\.csproj$' \
+  | xargs -I {} dotnet test {} --nologo
+
+# Run a single service's tests
 dotnet test services/gps-telematics/GpsTelematics.Tests
-dotnet test services/customs/Customs.Tests
-dotnet test services/payment/Payment.Application.Tests
 dotnet test tests/Ectn.UnitTests
 
 # Run with coverage
@@ -206,6 +209,21 @@ npm test
 ```bash
 docker compose -f docker-compose.test.yml up --abort-on-container-exit
 ```
+
+---
+
+## 🔒 Security
+
+The backend is hardened against the **OWASP Top 10 (2021)**. All 12 API services share the same
+building blocks in `building-blocks/web/` — deny-by-default authorization, strict JWT validation,
+rate limiting, opt-in CORS, security headers and generic error responses.
+
+See **[docs/security/OWASP-TOP-10-REMEDIATION.md](docs/security/OWASP-TOP-10-REMEDIATION.md)** for
+the full finding-by-finding breakdown, plus `docs/security/PHASE-15.6-SECURITY-BASELINE.md` for the
+Zero Trust architecture.
+
+CI enforces this with a NuGet vulnerability gate, Trivy, Checkov, SonarQube and an OWASP ZAP
+baseline scan.
 
 ---
 

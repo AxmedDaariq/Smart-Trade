@@ -9,6 +9,8 @@ namespace Declaration.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/declarations")]
+// A01: deny-by-default at controller level; individual actions add their permission policies.
+[Authorize]
 public class DeclarationsController : ControllerBase
 {
     private readonly IMediator _mediator;

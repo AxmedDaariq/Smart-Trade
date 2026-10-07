@@ -8,9 +8,14 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Analytics.Api.Controllers;
 
+/// <summary>
+/// A01: reads the tenant exclusively from the JWT (<c>tenant_id</c> claim). The previous version
+/// silently fell back to the caller supplied <c>tenantId</c> query value whenever the claim name
+/// did not match, which allowed any authenticated user to read another tenant's KPI.
+/// </summary>
 [ApiController]
 [Route("api/v1/analytics/kpis")]
-[Authorize]
+[Authorize(Policy = "analytics.kpi.read")]
 public class KpiController : ControllerBase
 {
     private readonly AnalyticsDbContext _context;
@@ -21,28 +26,26 @@ public class KpiController : ControllerBase
     }
 
     [HttpGet("transit-time")]
-    // [Authorize(Policy = "analytics.kpi.read")]
     public async Task<IActionResult> GetTransitTimeKpi([FromQuery] Guid? tenantId)
     {
-        // Extract TenantId from JWT to enforce tenant isolation unless user is Platform Admin
-        var userTenantId = Guid.Parse(User.FindFirst("TenantId")?.Value ?? tenantId.ToString() ?? Guid.Empty.ToString());
-        
-        // In a real scenario, this would query a materialized view or perform an aggregated query on FactTripMilestone
-        // calculating the P95 transit time.
-        
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var userTenantId)) return Forbid();
+
+        // A requested tenant may only be the caller's own tenant (or empty, meaning "mine").
+        if (tenantId.HasValue && tenantId.Value != userTenantId && tenantId.Value != Guid.Empty) return Forbid();
+
         var baseQuery = _context.FactTripMilestones.AsQueryable();
-        
+
         if (userTenantId != Guid.Empty)
         {
             baseQuery = baseQuery.Where(f => f.TenantId == userTenantId);
         }
-        
+
         var avgDuration = await baseQuery
             .Where(f => f.ActualDurationFromStart.HasValue)
             .AverageAsync(f => f.ActualDurationFromStart.Value.TotalHours);
 
-        return Ok(new 
-        { 
+        return Ok(new
+        {
             Code = "avg-transit-time",
             Name = "Average Transit Time",
             Value = avgDuration,

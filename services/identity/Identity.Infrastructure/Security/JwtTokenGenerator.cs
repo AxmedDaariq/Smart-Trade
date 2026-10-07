@@ -54,9 +54,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             claims.Add(new Claim("permissions", permission));
         }
 
+        var issuedAt = DateTime.UtcNow;
+
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_options.AccessTokenLifetimeMinutes),
+            notBefore: issuedAt,
+            expires: issuedAt.AddMinutes(_options.AccessTokenLifetimeMinutes),
             issuer: _options.Issuer,
             audience: _options.Audience,
             signingCredentials: credentials);

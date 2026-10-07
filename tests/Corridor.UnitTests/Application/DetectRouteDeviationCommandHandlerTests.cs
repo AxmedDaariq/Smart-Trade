@@ -31,7 +31,7 @@ public class DetectRouteDeviationCommandHandlerTests
     public async Task Handle_TripNotFound_ThrowsInvalidOperationException()
     {
         var emptyTrips = Enumerable.Empty<Trip>().AsQueryable().BuildMock();
-        _dbMock.Setup(x => x.Trips).Returns(emptyTrips.Object);
+        _dbMock.Setup(x => x.Trips).Returns(emptyTrips);
 
         var command = BuildCommand();
 
@@ -56,8 +56,8 @@ public class DetectRouteDeviationCommandHandlerTests
         var trips         = new List<Trip> { trip }.AsQueryable().BuildMock();
         var emptyVersions = Enumerable.Empty<RouteVersion>().AsQueryable().BuildMock();
 
-        _dbMock.Setup(x => x.Trips).Returns(trips.Object);
-        _dbMock.Setup(x => x.RouteVersions).Returns(emptyVersions.Object);
+        _dbMock.Setup(x => x.Trips).Returns(trips);
+        _dbMock.Setup(x => x.RouteVersions).Returns(emptyVersions);
 
         var command = BuildCommand(tripId: TripId);
 
