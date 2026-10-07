@@ -142,6 +142,10 @@ postgres-data/
 mysql-data/
 redis-data/
 data/
+# ...but keep .NET source code in folders named "Data" tracked (e.g. EF Core DbContexts),
+# since core.ignorecase=true makes "data/" also match "Data/" on case-insensitive filesystems
+!services/analytics/Analytics.Infrastructure/Data/
+!services/analytics/Analytics.Infrastructure/Data/**
 *.dump
 *.sql.gz
 
