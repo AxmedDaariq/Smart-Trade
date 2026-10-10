@@ -39,6 +39,7 @@ public class UpdateShipmentStatusCommandValidator : AbstractValidator<UpdateShip
 
 public interface IShippingQueryContext
 {
+    IQueryable<Shipment> ShipmentsQuery { get; }
     Task<Shipment?> GetShipmentWithHistoryAsync(Guid shipmentId, Guid tenantId, CancellationToken cancellationToken);
     Task<Shipment?> GetShipmentWithTrackingAsync(Guid shipmentId, Guid tenantId, CancellationToken cancellationToken);
     Task<bool> ShipmentExistsAsync(Guid shipmentId, Guid tenantId, CancellationToken cancellationToken);
