@@ -51,7 +51,7 @@ public class ShipmentsController : ControllerBase
         if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId))
             return Forbid();
 
-        var shipment = await _query.Shipments
+        var shipment = await _query.ShipmentsQuery
             .Include(s => s.Lines)
             .Include(s => s.Containers)
             .Include(s => s.Documents)
@@ -148,7 +148,7 @@ public class ShipmentsController : ControllerBase
         pageSize = Math.Clamp(pageSize, 1, 100);
         page = Math.Max(1, page);
 
-        var query = _query.Shipments.Where(s => s.TenantId == tenantId);
+        var query = _query.ShipmentsQuery.Where(s => s.TenantId == tenantId);
 
         if (!string.IsNullOrWhiteSpace(status) &&
             Enum.TryParse<ShipmentStatus>(status, ignoreCase: true, out var parsedStatus))

@@ -54,13 +54,13 @@ public class TrackingController : ControllerBase
             return Forbid();
 
         // Verify shipment belongs to tenant
-        var shipmentExists = await _query.Shipments
+        var shipmentExists = await _query.ShipmentsQuery
             .AnyAsync(s => s.Id == shipmentId && s.TenantId == tenantId);
 
         if (!shipmentExists)
             return NotFound(new { Message = $"Shipment {shipmentId} not found." });
 
-        var events = await _query.Shipments
+        var events = await _query.ShipmentsQuery
             .Where(s => s.Id == shipmentId)
             .SelectMany(s => s.TrackingEvents)
             .OrderBy(e => e.OccurredAtUtc)
