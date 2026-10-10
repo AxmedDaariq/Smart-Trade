@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shipping.Application.Commands;
+using BuildingBlocks.Persistence;
 using Shipping.Domain.Entities;
-using Shipping.Domain.Entities.Integration;
 using Shipping.Domain.Enums;
 
 namespace Shipping.Infrastructure.Persistence;
