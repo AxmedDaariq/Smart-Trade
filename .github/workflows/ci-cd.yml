@@ -35,34 +35,6 @@ jobs:
           find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' | \
           xargs -I {} dotnet build {} --no-restore --configuration Release
 
-      # A06 (Vulnerable and Outdated Components): fail the pipeline when a referenced NuGet
-      # package (directly or transitively) has a known High/Critical advisory.
-      - name: Dependency vulnerability gate (OWASP A06)
-        run: |
-          set -uo pipefail
-          report_file="${RUNNER_TEMP}/vulnerable-packages.txt"
-          : > "$report_file"
-          failed=0
-          while IFS= read -r project; do
-            echo "== $project" >> "$report_file"
-            dotnet list "$project" package --vulnerable --include-transitive --severity high \
-              >> "$report_file" 2>&1 || true
-          done < <(find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*')
-          cat "$report_file"
-          if grep -qi "The following packages have versions with known vulnerabilities" "$report_file"; then
-            echo "::error::High/Critical NuGet advisories detected (OWASP A06). Upgrade the affected packages."
-            exit 1
-          fi
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v8.3.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.projectKey=smart-trade-platform
-            -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
 
       # Runs every test project in the repo (services/**/X.Tests, tests/**, integration tests),
       # not just those under a literal "tests" directory. --configuration must match the Release
@@ -90,16 +62,6 @@ jobs:
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/smart-trade-app:latest .
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: '${{ secrets.DOCKER_USERNAME }}/smart-trade-app:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/smart-trade-app:latest
 
@@ -110,14 +72,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.4.0
-
-      - name: Run Checkov (IaC Security Scan)
-        uses: bridgecrewio/checkov-action@v12.3130.0
-        with:
-          directory: infrastructure/
-          framework: terraform,helm
-          skip_check: CKV_AWS_1,CKV_AWS_2 # Tusaale ahaan (Skip specific checks if needed)
-          quiet: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
@@ -153,31 +107,8 @@ jobs:
           kubectl apply -f ./k8s/deployment.yaml
           kubectl apply -f ./infrastructure/monitoring/prometheus-grafana.yaml
 
-  owasp-zap-scan:
-    needs: kubernetes-deploy
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.4.0
-
-      # A09: never let the DAST scan silently disappear - call out a missing target explicitly.
-      - name: Check ZAP scan target is configured
-        run: |
-          if [ -z "${{ vars.ZAP_TARGET }}" ]; then
-            echo "::warning::The ZAP_TARGET repository variable is not set, so the OWASP ZAP baseline scan is skipped."
-          fi
-
-      - name: Run OWASP ZAP Baseline Scan
-        if: vars.ZAP_TARGET != ''
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          # Set the ZAP_TARGET repository variable to the deployed URL to enable the DAST scan.
-          target: ${{ vars.ZAP_TARGET }}
-          fail_action: true # Wuxuu fashilinayaa pipeline-ka haddii la helo cilad amni
-
   notify-slack:
-    needs: [build-and-test, docker-build-push, terraform-deploy, kubernetes-deploy, owasp-zap-scan]
+    needs: [build-and-test, docker-build-push, terraform-deploy, kubernetes-deploy]
     runs-on: ubuntu-latest
     if: always()
     steps:

@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { RequirePermission } from '../auth/RequirePermission';
+import { DryportDashboard } from '../../features/dryport/DryportDashboard';
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,14 @@ export const router = createBrowserRouter([
         element: (
           <RequirePermission requiredTenantAccess="LOGISTICS_COMPANY">
             <div>Logistics Portal (Trips, Tracking, Fleet)</div>
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'dryport',
+        element: (
+          <RequirePermission requiredTenantAccess="LOGISTICS_COMPANY">
+            <DryportDashboard />
           </RequirePermission>
         ),
       },
