@@ -1,0 +1,42 @@
+replicaCount: 2
+
+image:
+  repository: "AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/smart-trade/shipping"
+  tag: "latest"
+
+containerPort: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "api.smart-trade.io"
+  path: "/api/shipping"
+
+resources:
+  requests:
+    cpu: 150m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+env:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  RABBITMQ__HOST: "rabbitmq.production.svc.cluster.local"
+  REDIS__CONNECTION: "smart-trade-prod-redis.production.cache.amazonaws.com:6379"
+
+vault:
+  enabled: true
+  role: "shipping-service"
+  secretPath: "secret/data/production/shipping"
+  template: |
+    {{- with secret "secret/data/production/shipping" -}}
+    export ConnectionStrings__DefaultConnection="{{ .Data.data.db_connection_string }}"
+    {{- end -}}

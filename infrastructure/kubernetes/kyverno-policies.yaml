@@ -1,0 +1,38 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-root-and-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Root and Privileged Containers
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Containers must run as non-root users, drop all root Linux capabilities,
+      and prohibit privilege escalation to enforce Zero-Trust and CIS benchmarks.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-runAsNonRoot
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - dev
+                - staging
+                - production
+      validate:
+        message: "Running containers as root is disallowed in enterprise namespaces."
+        pattern:
+          spec:
+            =(securityContext):
+              runAsNonRoot: true
+            containers:
+              - =(securityContext):
+                  runAsNonRoot: true
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                      - ALL

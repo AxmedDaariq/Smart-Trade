@@ -1,0 +1,134 @@
+{{/*
+NetworkPolicy — zero-trust: deny all by default, allow only what's needed
+*/}}
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "smart-trade-service.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "smart-trade-service.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "smart-trade-service.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # ─── INGRESS ───────────────────────────────────────────────────────────────
+  ingress:
+    # Allow traffic from the API Gateway / Ingress controller namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: {{ .Values.containerPort }}
+
+    # Allow traffic from services in the same namespace (inter-service)
+    - from:
+        - podSelector: {}   # Any pod in same namespace
+      ports:
+        - protocol: TCP
+          port: {{ .Values.containerPort }}
+
+    # Allow Prometheus scraping from monitoring namespace
+    {{- if .Values.metrics.enabled }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: {{ .Values.metrics.port | default 9090 }}
+    {{- end }}
+
+    # Allow Vault agent injection from vault namespace
+    {{- if .Values.vault.enabled }}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: vault
+      ports:
+        - protocol: TCP
+          port: 8200
+    {{- end }}
+
+  # ─── EGRESS ────────────────────────────────────────────────────────────────
+  egress:
+    # Allow DNS resolution (CoreDNS)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Allow access to other services in the same namespace
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.containerPort }}
+
+    # Allow access to PostgreSQL (RDS via in-cluster or service)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow access to Redis
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: 6379
+
+    # Allow access to RabbitMQ
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Release.Namespace }}
+      ports:
+        - protocol: TCP
+          port: 5672
+
+    # Allow HTTPS egress (for external APIs, AWS SDK calls)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 169.254.0.0/16   # Block IMDS except via IRSA
+              - 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 443
+
+    # Allow access to Vault
+    {{- if .Values.vault.enabled }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: vault
+      ports:
+        - protocol: TCP
+          port: 8200
+    {{- end }}
+{{- end }}

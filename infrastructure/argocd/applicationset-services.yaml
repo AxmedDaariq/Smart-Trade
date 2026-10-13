@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: smart-trade-services
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          # Matrix across environments
+          - list:
+              elements:
+                - env: dev
+                  namespace: dev
+                - env: staging
+                  namespace: staging
+                - env: production
+                  namespace: production
+          # Matrix across all microservices
+          - list:
+              elements:
+                - service: identity
+                - service: customs
+                - service: shipping
+                - service: payment
+                - service: notification
+                - service: fleet
+                - service: gps
+                - service: gps-telematics
+                - service: audit
+                - service: declaration
+                - service: analytics
+                - service: corridor
+                - service: dryport
+                - service: ectn
+                - service: anpr-gate
+                - service: ais-vessel
+                - service: integration
+  template:
+    metadata:
+      name: '{{env}}-{{service}}'
+      labels:
+        environment: '{{env}}'
+        service: '{{service}}'
+    spec:
+      project: smart-trade-project
+      source:
+        repoURL: 'https://github.com/AxmedDaariq/Smart-Trade.git'
+        targetRevision: HEAD
+        path: infrastructure/helm/smart-trade-service
+        helm:
+          valueFiles:
+            - values.yaml
+            - '../environments/{{env}}/values-{{service}}.yaml'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m

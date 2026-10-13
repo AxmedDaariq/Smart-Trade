@@ -1,0 +1,33 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Identity.UnitTests</AssemblyName>
+    <RootNamespace>Identity.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Identity layers -->
+    <ProjectReference Include="..\..\..\services\identity\Identity.Application\Identity.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\identity\Identity.Api\Identity.Api.csproj" />
+  </ItemGroup>
+
+</Project>

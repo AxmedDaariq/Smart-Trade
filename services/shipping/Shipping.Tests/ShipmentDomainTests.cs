@@ -1,5 +1,7 @@
 using Shipping.Domain.Entities;
 using Shipping.Domain.Enums;
+using System.Linq;
+using Xunit;
 
 namespace Shipping.Tests;
 
@@ -66,11 +68,14 @@ public class ShipmentDomainTests
         Assert.Equal(ShipmentStatus.PickedUp, shipment.Status);
         Assert.Equal(2, shipment.StatusHistories.Count);
 
-        Assert.Equal("Draft", shipment.StatusHistories[0].FromStatus);
-        Assert.Equal("Booked", shipment.StatusHistories[0].ToStatus);
+        var first = shipment.StatusHistories.First();
+        var second = shipment.StatusHistories.Skip(1).First();
 
-        Assert.Equal("Booked", shipment.StatusHistories[1].FromStatus);
-        Assert.Equal("PickedUp", shipment.StatusHistories[1].ToStatus);
+        Assert.Equal("Draft", first.FromStatus);
+        Assert.Equal("Booked", first.ToStatus);
+
+        Assert.Equal("Booked", second.FromStatus);
+        Assert.Equal("PickedUp", second.ToStatus);
     }
 
     [Fact]

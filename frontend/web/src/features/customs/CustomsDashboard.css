@@ -1,0 +1,115 @@
+/* Customs & Government Operations Dashboard */
+.customs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.customs-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1.5rem;
+}
+
+.customs-hero-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.customs-hero-desc {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-top: 0.35rem;
+}
+
+/* WCO Risk Channels Bar */
+.risk-channels-panel {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.channels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.channel-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channel-green {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+}
+
+.channel-yellow {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+}
+
+.channel-red {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+}
+
+.channel-count {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.channel-name {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.channel-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Lane Risk Badges */
+.lane-badge {
+  font-size: 0.71875rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.lane-badge-green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.lane-badge-yellow {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.lane-badge-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}

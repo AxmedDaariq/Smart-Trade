@@ -1,0 +1,161 @@
+name: "🔒 Weekly Security Audit"
+
+on:
+  schedule:
+    - cron: "0 2 * * 1"   # Every Monday at 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 1: Scan all ECR images with Trivy
+  # ─────────────────────────────────────────────────────────────────────────────
+  trivy-all-images:
+    name: "🐳 Scan ECR Images"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [identity, customs, shipping, payment, notification, fleet, gps, audit, declaration, analytics, corridor, dryport, ectn, anpr-gate, ais-vessel, integration]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_READONLY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Run Trivy on ${{ matrix.service }}
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/smart-trade/${{ matrix.service }}:latest"
+          format: sarif
+          output: trivy-${{ matrix.service }}.sarif
+          severity: CRITICAL,HIGH
+          exit-code: "0"  # Weekly audit — don't fail, report instead
+
+      - name: Upload scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-${{ matrix.service }}.sarif
+          category: trivy-${{ matrix.service }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 2: Full repo secret scan
+  # ─────────────────────────────────────────────────────────────────────────────
+  gitleaks-full:
+    name: "🔐 Full Repo Secret Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks full scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 3: Dependency vulnerability check (OWASP)
+  # ─────────────────────────────────────────────────────────────────────────────
+  dependency-check:
+    name: "📦 OWASP Dependency Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "smart-trade-logistics-platform"
+          path: "."
+          format: "HTML"
+          out: "dependency-check-report"
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+
+      - name: Upload dependency check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: dependency-check-report/
+          retention-days: 30
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 4: Terraform Security Scan (tfsec)
+  # ─────────────────────────────────────────────────────────────────────────────
+  tfsec:
+    name: "🏛️ Terraform Security (tfsec)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: tfsec scan
+        uses: aquasecurity/tfsec-sarif-action@v0.1.4
+        with:
+          sarif_file: tfsec.sarif
+          working_directory: infrastructure/terraform
+
+      - name: Upload tfsec results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: tfsec.sarif
+          category: tfsec
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 5: Create summary issue if vulnerabilities found
+  # ─────────────────────────────────────────────────────────────────────────────
+  security-report:
+    name: "📊 Security Report Issue"
+    runs-on: ubuntu-latest
+    needs: [trivy-all-images, gitleaks-full, dependency-check, tfsec]
+    if: always()
+    steps:
+      - name: Create security summary issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const results = {
+              trivy:      '${{ needs.trivy-all-images.result }}',
+              gitleaks:   '${{ needs.gitleaks-full.result }}',
+              depcheck:   '${{ needs.dependency-check.result }}',
+              tfsec:      '${{ needs.tfsec.result }}'
+            };
+            const hasFailure = Object.values(results).includes('failure');
+            if (!hasFailure) return;
+
+            const body = `## 🔒 Weekly Security Audit — ${date}
+
+            | Tool | Result |
+            |------|--------|
+            | Trivy (ECR Images) | ${results.trivy} |
+            | Gitleaks (Secrets) | ${results.gitleaks} |
+            | OWASP Dep Check   | ${results.depcheck} |
+            | tfsec (Terraform) | ${results.tfsec} |
+
+            [View Security Alerts](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/security)
+            [View Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+
+            @${context.repo.owner}/security-team please review and address the above.`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔒 Security Audit Findings — ${date}`,
+              body: body,
+              labels: ['security', 'automated']
+            });

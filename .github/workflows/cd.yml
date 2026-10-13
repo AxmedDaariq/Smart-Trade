@@ -1,0 +1,360 @@
+name: "CD — Continuous Delivery"
+
+on:
+  push:
+    branches: [main]
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options: [dev, staging, production]
+      service:
+        description: "Service to deploy (leave empty for all)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write   # OIDC for keyless AWS auth
+  packages: write   # Push to GHCR (optional fallback)
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false   # Never cancel a running deployment
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  AWS_REGION: "us-east-1"
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 1: Determine which services changed (smart matrix)
+  # ─────────────────────────────────────────────────────────────────────────────
+  detect-changes:
+    name: "🔍 Detect Changed Services"
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.filter.outputs.services }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4.4.0
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed service directories
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            identity:      ['services/identity/**']
+            customs:       ['services/customs/**']
+            shipping:      ['services/shipping/**']
+            payment:       ['services/payment/**']
+            notification:  ['services/notification/**']
+            fleet:         ['services/fleet/**']
+            gps:           ['services/gps/**']
+            gps-telematics:['services/gps-telematics/**']
+            audit:         ['services/audit/**']
+            declaration:   ['services/declaration/**']
+            analytics:     ['services/analytics/**']
+            corridor:      ['services/corridor/**']
+            dryport:       ['services/dryport/**']
+            ectn:          ['services/ectn/**']
+            anpr-gate:     ['services/anpr-gate/**']
+            ais-vessel:    ['services/ais-vessel/**']
+            integration:   ['services/integration/**']
+
+      - name: Build service matrix
+        id: set-matrix
+        run: |
+          SERVICES=()
+          for svc in identity customs shipping payment notification fleet gps gps-telematics audit declaration analytics corridor dryport ectn anpr-gate ais-vessel integration; do
+            if [ "${{ steps.filter.outputs[svc] }}" == "true" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+              SERVICES+=("{\"service\":\"${svc}\"}")
+            fi
+          done
+          # Force rebuild all on tag push
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            SERVICES=()
+            for svc in identity customs shipping payment notification fleet gps gps-telematics audit declaration analytics corridor dryport ectn anpr-gate ais-vessel integration; do
+              SERVICES+=("{\"service\":\"${svc}\"}")
+            done
+          fi
+          MATRIX=$(echo "[$(IFS=','; echo "${SERVICES[*]}")]")
+          echo "matrix={\"include\":${MATRIX}}" >> $GITHUB_OUTPUT
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 2: Build, Sign & Push Docker images
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-push:
+    name: "🐳 Build & Push — ${{ matrix.include.service }}"
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.matrix != '{"include":[]}' }}
+    strategy:
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+      fail-fast: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Configure AWS credentials (OIDC — no static keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActions-CD-${{ github.run_id }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx (multi-platform)
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ECR_REGISTRY }}/smart-trade/${{ matrix.include.service }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+
+      - name: Build and push multi-arch image
+        id: build-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: services/${{ matrix.include.service }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.include.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.include.service }}
+          build-args: |
+            BUILD_VERSION=${{ github.ref_name }}
+            BUILD_COMMIT=${{ github.sha }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+
+      - name: Install Cosign (keyless image signing)
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image with Cosign (OIDC keyless)
+        run: |
+          cosign sign --yes \
+            "${{ env.ECR_REGISTRY }}/smart-trade/${{ matrix.include.service }}@${{ steps.build-push.outputs.digest }}"
+
+      - name: Run Trivy on pushed image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: "${{ env.ECR_REGISTRY }}/smart-trade/${{ matrix.include.service }}@${{ steps.build-push.outputs.digest }}"
+          format: table
+          severity: CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+
+      - name: Store image digest for GitOps update
+        run: |
+          echo "${{ matrix.include.service }}=${{ steps.build-push.outputs.digest }}" \
+            >> /tmp/image-digests.txt
+
+      - name: Upload image digests
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.include.service }}
+          path: /tmp/image-digests.txt
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 3: Update ArgoCD image tags in Git (GitOps)
+  # ─────────────────────────────────────────────────────────────────────────────
+  gitops-update:
+    name: "🔄 GitOps Image Tag Update"
+    runs-on: ubuntu-latest
+    needs: build-push
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4.4.0
+        with:
+          token: ${{ secrets.GITOPS_PAT }}  # PAT with repo write
+
+      - name: Download all image digests
+        uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          merge-multiple: true
+          path: /tmp/digests
+
+      - name: Update Helm values with new image tags
+        run: |
+          for file in /tmp/digests/*.txt; do
+            while IFS= read -r line; do
+              SVC=$(echo "$line" | cut -d= -f1)
+              DIGEST=$(echo "$line" | cut -d= -f2)
+              VALUES_FILE="infrastructure/helm/environments/production/values-${SVC}.yaml"
+              if [ -f "$VALUES_FILE" ]; then
+                sed -i "s|tag:.*|tag: \"sha-${GITHUB_SHA:0:7}\"|" "$VALUES_FILE"
+                echo "Updated ${VALUES_FILE} to sha-${GITHUB_SHA:0:7}"
+              fi
+            done < "$file"
+          done
+
+      - name: Commit and push image tag updates
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(gitops): update image tags to sha-${{ github.sha }}"
+          commit_author: "GitHub Actions <actions@github.com>"
+          branch: main
+          push_options: "--force-with-lease"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 4: Deploy to DEV (auto)
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-dev:
+    name: "🚀 Deploy — dev"
+    runs-on: ubuntu-latest
+    needs: gitops-update
+    environment:
+      name: dev
+      url: https://dev.smart-trade.io
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEV_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync ArgoCD — dev apps
+        uses: clowdhaus/argo-cd-action@v2
+        with:
+          command: app sync smart-trade-dev
+          options: --timeout 300 --health
+
+      - name: Wait for ArgoCD health
+        uses: clowdhaus/argo-cd-action@v2
+        with:
+          command: app wait smart-trade-dev
+          options: --health --timeout 300
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 5: Deploy to STAGING (auto after dev passes)
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-staging:
+    name: "🚀 Deploy — staging"
+    runs-on: ubuntu-latest
+    needs: deploy-dev
+    environment:
+      name: staging
+      url: https://staging.smart-trade.io
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_STAGING_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync ArgoCD — staging apps
+        uses: clowdhaus/argo-cd-action@v2
+        with:
+          command: app sync smart-trade-staging
+          options: --timeout 600 --health
+
+      - name: Run smoke tests against staging
+        run: |
+          echo "Running smoke tests against https://staging.smart-trade.io ..."
+          # Add k6 / Playwright / curl health checks here
+          curl --retry 5 --retry-delay 10 --fail \
+            https://staging.smart-trade.io/health/live || exit 1
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 6: Deploy to PRODUCTION (manual approval required)
+  # ─────────────────────────────────────────────────────────────────────────────
+  deploy-production:
+    name: "🚀 Deploy — production (requires approval)"
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: production
+      url: https://api.smart-trade.io
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_PROD_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify image signatures before production deploy
+        run: |
+          for svc in identity customs shipping payment notification fleet; do
+            IMAGE="${{ env.ECR_REGISTRY }}/smart-trade/${svc}:sha-${GITHUB_SHA:0:7}"
+            echo "Verifying signature for ${IMAGE}..."
+            cosign verify \
+              --certificate-identity-regexp="https://github.com/${{ github.repository }}/.github/workflows/cd.yml" \
+              --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+              "${IMAGE}"
+          done
+
+      - name: Sync ArgoCD — production apps
+        uses: clowdhaus/argo-cd-action@v2
+        with:
+          command: app sync smart-trade-production
+          options: --timeout 900 --health --prune
+
+      - name: Wait for production health
+        uses: clowdhaus/argo-cd-action@v2
+        with:
+          command: app wait smart-trade-production
+          options: --health --timeout 900
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 7: Notify team on completion
+  # ─────────────────────────────────────────────────────────────────────────────
+  notify:
+    name: "📣 Notify"
+    runs-on: ubuntu-latest
+    needs: [deploy-dev, deploy-staging, deploy-production]
+    if: always()
+    steps:
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@v2.4.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: "#deployments"
+          SLACK_COLOR: ${{ (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'danger' || 'good' }}
+          SLACK_ICON_EMOJI: ":rocket:"
+          SLACK_USERNAME: "Smart Trade CD Bot"
+          SLACK_TITLE: "Deployment — ${{ github.ref_name }}"
+          SLACK_MESSAGE: |
+            *Commit:* `${{ github.sha }}`
+            *Triggered by:* ${{ github.actor }}
+            *Dev:* ${{ needs.deploy-dev.result }}
+            *Staging:* ${{ needs.deploy-staging.result }}
+            *Production:* ${{ needs.deploy-production.result }}
+          SLACK_FOOTER: "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"

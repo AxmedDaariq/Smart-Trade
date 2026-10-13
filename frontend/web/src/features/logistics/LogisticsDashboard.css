@@ -1,0 +1,335 @@
+/* Logistics Dashboard Styling */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1.5rem;
+}
+
+.dashboard-hero-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dashboard-hero-desc {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-top: 0.35rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* KPI Cards Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.kpi-card {
+  background: linear-gradient(145deg, rgba(21, 31, 50, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, transparent);
+}
+
+.kpi-card.kpi-success::before {
+  background: linear-gradient(90deg, #10b981, transparent);
+}
+
+.kpi-card.kpi-warning::before {
+  background: linear-gradient(90deg, #f59e0b, transparent);
+}
+
+.kpi-card.kpi-purple::before {
+  background: linear-gradient(90deg, #a855f7, transparent);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.kpi-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.kpi-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: #60a5fa;
+}
+
+.kpi-value {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: var(--font-heading);
+}
+
+.kpi-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.78125rem;
+  color: #64748b;
+}
+
+.kpi-trend-positive {
+  color: #34d399;
+  font-weight: 600;
+}
+
+.kpi-trend-negative {
+  color: #f87171;
+  font-weight: 600;
+}
+
+/* Corridor Flow Visualizer */
+.corridor-milestone-panel {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.corridor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.corridor-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.corridor-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 1rem 0;
+}
+
+.corridor-line {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  right: 5%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.corridor-line-progress {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  width: 65%;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  transform: translateY(-50%);
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.corridor-stop {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.corridor-node {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #0f172a;
+  border: 3px solid #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.corridor-node.passed {
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.corridor-node.current {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.corridor-node.upcoming {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #64748b;
+}
+
+.stop-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.stop-meta {
+  font-size: 0.71875rem;
+  color: #94a3b8;
+}
+
+/* Shipments Data Table */
+.data-panel {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.panel-toolbar {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.enterprise-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.enterprise-table th {
+  background: rgba(30, 41, 59, 0.4);
+  color: #94a3b8;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.enterprise-table td {
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+}
+
+.enterprise-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tracking-num {
+  font-family: monospace;
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+.action-link {
+  color: #38bdf8;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}

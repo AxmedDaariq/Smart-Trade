@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Customs.UnitTests</AssemblyName>
+    <RootNamespace>Customs.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Customs layers -->
+    <ProjectReference Include="..\..\..\services\customs\Customs.Domain\Customs.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Contracts\Customs.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Application\Customs.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Infrastructure\Customs.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Api\Customs.Api.csproj" />
+  </ItemGroup>
+
+</Project>

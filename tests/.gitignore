@@ -1,0 +1,14 @@
+[Aa]rchive/
+[Bb]in/
+[Oo]bj/
+TestResults/
+*.trx
+*.coverage
+*.opencover.xml
+coverage/
+cypress/videos/
+cypress/screenshots/
+node_modules/
+.nyc_output/
+reports/
+*.log

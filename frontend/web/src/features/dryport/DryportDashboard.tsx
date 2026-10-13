@@ -1,42 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './DryportDashboard.css';
 import { AddContainerModal } from './AddContainerModal';
-
-interface ContainerDemurrage {
-  containerId: string;
-  containerNumber: string;
-  status: string;
-  daysInPort: number;
-  freeDays: number;
-  accruedDemurrage: number;
-  currency: string;
-}
+import { useDryportDemurrage } from './hooks/useDryportDemurrage';
 
 export const DryportDashboard: React.FC = () => {
-  const [containers, setContainers] = useState<ContainerDemurrage[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const {
+    containers,
+    isLoading,
+    isError,
+    error,
+    addContainer,
+    isAdding
+  } = useDryportDemurrage();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchDemurrageData = async () => {
-      try {
-        // Demo Data
-        const demoData: ContainerDemurrage[] = [
-          { containerId: '1', containerNumber: 'MSCU1234567', status: 'InStorage', daysInPort: 12, freeDays: 7, accruedDemurrage: 250.00, currency: 'USD' },
-          { containerId: '2', containerNumber: 'CMAU9876543', status: 'InStorage', daysInPort: 6, freeDays: 7, accruedDemurrage: 0, currency: 'USD' },
-          { containerId: '3', containerNumber: 'MAEU4445556', status: 'Arrived', daysInPort: 8, freeDays: 7, accruedDemurrage: 50.00, currency: 'USD' }
-        ];
-        
-        setContainers(demoData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Waxaa dhacday cilad:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchDemurrageData();
-  }, []);
 
   const totalContainers = containers.length;
   const criticalContainers = containers.filter(c => c.accruedDemurrage > 0).length;
@@ -55,18 +32,25 @@ export const DryportDashboard: React.FC = () => {
     return 'Safe (Waqti baa haray)';
   };
 
-  const handleContainerSubmit = (data: any) => {
-    console.log("Kunteenar cusub ayaa la diiwaangeliyay:", data);
-    // Add logic here to POST to backend
+  const handleContainerSubmit = async (data: any) => {
+    try {
+      await addContainer(data);
+      console.log("Kunteenar cusub ayaa la diiwaangeliyay");
+    } catch (err) {
+      console.error("Cilad ayaa dhacday marka la kaydinayay kunteenarka:", err);
+      alert("Cilad ayaa dhacday: Kunteenarka lama kaydin");
+    }
   };
 
-  if (loading) return <div className="dryport-container"><h2>Xogta waa la soo duba-ridayaa... (Loading...)</h2></div>;
+  if (isLoading) return <div className="dryport-container"><h2 style={{ textAlign: 'center', padding: '2rem' }}>Xogta waa la soo duba-ridayaa... (Loading...)</h2></div>;
+
+  if (isError) return <div className="dryport-container"><h2 style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>Cilad ayaa dhacday: {error instanceof Error ? error.message : 'Unknown Error'}</h2></div>;
 
   return (
     <div className="dryport-container">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Dryport Demurrage Dashboard</h1>
-        <button onClick={() => setIsModalOpen(true)} className="btn-primary" style={{ padding: '0.75rem 1.5rem', background: '#0f172a', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+        <h1 className="dashboard-title">Dryport Demurrage & Yard Dashboard</h1>
+        <button onClick={() => setIsModalOpen(true)} className="btn-primary">
           + Diiwaangeli Kunteenar
         </button>
       </div>
@@ -125,7 +109,7 @@ export const DryportDashboard: React.FC = () => {
         </table>
       </div>
 
-      <AddContainerModal 
+      <AddContainerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleContainerSubmit}
