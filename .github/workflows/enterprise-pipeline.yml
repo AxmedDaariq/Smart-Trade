@@ -1,0 +1,96 @@
+name: Smart Trade Logistics Enterprise CI/CD
+
+on:
+  push:
+    branches: [ main, testing ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 1. Build and Static Analysis
+  build-and-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Application
+        run: dotnet build --configuration Release
+
+  # 2. Testing Pyramid (Unit -> Integration -> E2E)
+  test-suite:
+    needs: build-and-analyze
+    runs-on: ubuntu-latest
+    services:
+      # Database for Integration Tests
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+      # MongoDB for Log/Audit Tests
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      
+      - name: Run Unit Tests
+        run: dotnet test tests/01-unit
+
+      - name: Run Integration Tests (Testcontainers)
+        run: dotnet test tests/02-integration
+
+      - name: Run E2E Tests (Cypress)
+        run: |
+          cd tests/03-e2e/cypress
+          npm install
+          npm run cy:run
+
+  # 3. Security & Performance Audit
+  security-and-perf:
+    needs: test-suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run OWASP ZAP Security Scan
+        run: |
+          docker run --rm -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py \
+          -t http://localhost:5000 -r zap_report.html
+          
+      - name: Run JMeter Performance Baseline
+        run: |
+          # This assumes jmeter is installed on the runner or uses a docker image
+          docker run --rm -v $(pwd):/tests jmeter/jmeter -n -t tests/04-performance/jmeter/scripts/load_test_platform.jmx -l results.jtl
+
+  # 4. Infrastructure & Deployment (CD)
+  deploy-staging:
+    needs: security-and-perf
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to K8s Staging
+        run: |
+          echo "Applying Kubernetes Manifests..."
+          # kubectl apply -f k8s/deployment.yaml
+          # kubectl apply -f tests/06-infrastructure/k8s-validation/readiness_liveness.yaml
+          
+      - name: Post-Deploy Health Check
+        run: |
+          python3 tests/06-infrastructure/health-checks/global_health_check.py

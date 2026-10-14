@@ -1,0 +1,13 @@
+{
+  "name": "smart-trade-logistics-e2e",
+  "version": "1.0.0",
+  "description": "End-to-End tests for Smart Trade Logistics Platform",
+  "main": "index.js",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.0"
+  }
+}

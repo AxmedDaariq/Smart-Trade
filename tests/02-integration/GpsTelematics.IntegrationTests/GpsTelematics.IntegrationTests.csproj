@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>GpsTelematics.IntegrationTests</AssemblyName>
+    <RootNamespace>GpsTelematics.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\gps-telematics\GpsTelematics.Domain\GpsTelematics.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\gps-telematics\GpsTelematics.Contracts\GpsTelematics.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\gps-telematics\GpsTelematics.Application\GpsTelematics.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\gps-telematics\GpsTelematics.Infrastructure\GpsTelematics.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\gps-telematics\GpsTelematics.Api\GpsTelematics.Api.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+# Infrastructure Test for Kubernetes Probes
+# This ensures that the infrastructure can detect a failing service and restart it automatically.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customs-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: customs-api
+        image: customs-api:latest
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5

@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Shipping.IntegrationTests</AssemblyName>
+    <RootNamespace>Shipping.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\shipping\Shipping.Domain\Shipping.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\shipping\Shipping.Contracts\Shipping.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\shipping\Shipping.Application\Shipping.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\shipping\Shipping.Infrastructure\Shipping.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\shipping\Shipping.Api\Shipping.Api.csproj" />
+  </ItemGroup>
+
+</Project>
