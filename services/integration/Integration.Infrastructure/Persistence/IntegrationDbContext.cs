@@ -6,6 +6,7 @@ namespace Integration.Infrastructure.Persistence;
 public class IntegrationDbContext : DbContext
 {
     // 1. Integration Core
+    public DbSet<WebhookEndpoint> WebhookEndpoints { get; set; } = null!;
     public DbSet<IntegrationPartner> Partners { get; set; } = null!;
     public DbSet<IntegrationSystem> Systems { get; set; } = null!;
     public DbSet<IntegrationEndpoint> Endpoints { get; set; } = null!;

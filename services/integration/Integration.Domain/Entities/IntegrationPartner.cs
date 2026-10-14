@@ -6,6 +6,7 @@ public class IntegrationPartner
     public Guid? TenantId { get; set; }
     
     public string PartnerReference { get; set; } = string.Empty;
+    public string PartnerCode { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     
     public string PartnerType { get; set; } = string.Empty; // Government, Bank, MobileMoney, PaymentProvider, ECTNProvider, CustomsSystem, GPSProvider, AISProvider, ANPRProvider, PortAuthority, BorderAuthority, TradePartner, LogisticsCompany, TMA, InternalService, Other
