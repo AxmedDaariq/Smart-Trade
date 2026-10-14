@@ -18,12 +18,13 @@ public class GpsRepository : IGpsRepository
 
     public async Task<GpsPosition> GetPositionByIdAsync(Guid id, Guid tenantId)
     {
-        return await _context.Positions.FirstOrDefaultAsync(p => p.Id == id && p.TenantId == tenantId);
+        return await _context.GpsPositions.FirstOrDefaultAsync(p => p.Id == id && p.TenantId == tenantId);
     }
+
 
     public async Task AddPositionAsync(GpsPosition position)
     {
-        await _context.Positions.AddAsync(position);
+        await _context.GpsPositions.AddAsync(position);
     }
 
     public async Task SaveChangesAsync()
