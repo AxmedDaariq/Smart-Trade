@@ -16,12 +16,12 @@ public class AnprGateRepository : IAnprGateRepository
         _context = context;
     }
 
-    public async Task<RecognitionEvent> GetRecognitionByIdAsync(Guid id)
+    public async Task<AnprRecognitionEvent> GetRecognitionByIdAsync(Guid id)
     {
         return await _context.RecognitionEvents.FindAsync(id);
     }
 
-    public async Task AddRecognitionAsync(RecognitionEvent recognition)
+    public async Task AddRecognitionAsync(AnprRecognitionEvent recognition)
     {
         await _context.RecognitionEvents.AddAsync(recognition);
     }
