@@ -33,7 +33,7 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_PASSWORD: password
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
         ports:
           - 5432:5432
       # MongoDB for Log/Audit Tests
