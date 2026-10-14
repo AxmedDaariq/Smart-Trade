@@ -45,10 +45,10 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore projects
-        run: dotnet restore smart-trade.sln
+        run: dotnet restore
 
       - name: Check formatting (dotnet format)
-        run: dotnet format smart-trade.sln --verify-no-changes --no-restore
+        run: dotnet format --verify-no-changes --no-restore
         continue-on-error: true  # Report but don't block; enforce via pre-commit
 
       - name: Lint YAML files
