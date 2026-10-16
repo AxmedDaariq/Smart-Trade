@@ -9,9 +9,8 @@ class ApiClient {
   static const String _tokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
 
-  ApiClient({required String baseUrl, required FlutterSecureStorage secureStorage})
-      : _secureStorage = secureStorage,
-        _dio = Dio(BaseOptions(
+  ApiClient({required String baseUrl, required this._secureStorage})
+      : _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
@@ -25,6 +24,21 @@ class ApiClient {
   /// interceptor pipeline without a live backend.
   @visibleForTesting
   Dio get dio => _dio;
+
+  /// Refresh token endpoint – backend should set new access token in the response body
+  Future<bool> refreshToken() async {
+    try {
+      final response = await _dio.get('/api/auth/refresh');
+      if (response.statusCode == 200) {
+        final newToken = response.data['accessToken'] as String?;
+        if (newToken != null) {
+          await _secureStorage.write(key: _tokenKey, value: newToken);
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  }
 
   Interceptor _createAuthInterceptor() {
     return InterceptorsWrapper(

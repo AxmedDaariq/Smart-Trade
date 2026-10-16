@@ -24,6 +24,7 @@ yarn-error.log*
 
 # === Infrastructure & Tools ===
 .env
+.env.test
 *.local
 *.secrets
 .terraform/

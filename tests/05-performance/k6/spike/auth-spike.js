@@ -26,7 +26,7 @@ const BASE_URL = __ENV.API_URL ?? 'http://localhost:5000';
 
 export default function () {
   const res = http.post(`${BASE_URL}/api/v1/identity/auth/login`,
-    JSON.stringify({ tenantCode: 'ACME', email: 'admin@acme.com', password: 'Admin@123456!' }),
+    JSON.stringify({ tenantCode: 'ACME', email: 'admin@acme.com', password: __ENV.K6_TEST_PASSWORD ?? 'USE_ENV_VAR_K6_TEST_PASSWORD' }),
     { headers: { 'Content-Type': 'application/json' } });
 
   errorRate.add(!check(res, { 'not 5xx': (r) => r.status < 500 }));

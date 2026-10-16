@@ -29,7 +29,7 @@ export default function () {
   const payload = JSON.stringify({
     tenantCode: 'ACME',
     email:      'admin@acme.com',
-    password:   'Admin@123456!',
+    password:   __ENV.K6_TEST_PASSWORD ?? 'USE_ENV_VAR_K6_TEST_PASSWORD',
   });
 
   const params = {

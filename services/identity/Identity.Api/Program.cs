@@ -13,20 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetSection(JwtTokenOptions.SectionName).Get<JwtTokenOptions>();
 if (jwt == null)
 {
-    if (builder.Environment.IsEnvironment("Test") || builder.Environment.IsDevelopment())
-    {
-        jwt = new JwtTokenOptions
-        {
-            Secret = "0123456789abcdef0123456789abcdef",
-            Issuer = "test",
-            Audience = "test",
-            AccessTokenLifetimeMinutes = 15
-        };
-    }
-    else
-    {
-        throw new InvalidOperationException("Jwt configuration is required.");
-    }
+    throw new InvalidOperationException("Jwt configuration is required.");
 }
 if (string.IsNullOrWhiteSpace(jwt.Secret) || Encoding.UTF8.GetByteCount(jwt.Secret) < 32 ||
     string.IsNullOrWhiteSpace(jwt.Issuer) || string.IsNullOrWhiteSpace(jwt.Audience) ||

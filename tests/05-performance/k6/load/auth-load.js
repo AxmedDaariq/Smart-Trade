@@ -35,7 +35,7 @@ export default function () {
   const payload = JSON.stringify({
     tenantCode: 'ACME',
     email:      `user${Math.floor(Math.random() * 100)}@acme.com`,
-    password:   'Admin@123456!',
+    password:   __ENV.K6_TEST_PASSWORD ?? 'USE_ENV_VAR_K6_TEST_PASSWORD',
   });
 
   const params = { headers: { 'Content-Type': 'application/json' } };
