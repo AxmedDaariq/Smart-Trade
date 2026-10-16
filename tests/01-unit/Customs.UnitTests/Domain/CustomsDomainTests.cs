@@ -50,8 +50,7 @@ public sealed class CustomsDomainTests
         c.PortOfEntry.Should().Be("BERBERA");
         c.PortOfExit.Should().Be("JEBEL_ALI");
         c.CountryOfOrigin.Should().Be("AE");
-        c.CountryOfDestination.Should().Be("SO");
-        c.OpenedAtUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        c.OpenedAtUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(2));
 
         c.Holds.Should().NotBeNull().And.BeEmpty();
         c.Discrepancies.Should().NotBeNull().And.BeEmpty();

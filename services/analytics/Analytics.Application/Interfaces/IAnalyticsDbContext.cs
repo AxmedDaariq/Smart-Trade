@@ -23,5 +23,8 @@ public interface IAnalyticsDbContext
     /// <summary>Stages a trip milestone fact for persistence.</summary>
     void AddFactTripMilestone(FactTripMilestone fact);
 
+    /// <summary>Calculates the average transit time (in hours) for a specific tenant.</summary>
+    Task<double> GetAverageTransitTimeAsync(Guid tenantId, CancellationToken cancellationToken = default);
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

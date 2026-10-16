@@ -27,6 +27,22 @@ public class AnalyticsDbContext : DbContext, IAnalyticsDbContext
     public void AddFactTripMilestone(FactTripMilestone fact)
         => FactTripMilestones.Add(fact);
 
+    public async Task<double> GetAverageTransitTimeAsync(Guid tenantId, CancellationToken cancellationToken = default)
+    {
+        var query = FactTripMilestones.AsQueryable();
+        if (tenantId != Guid.Empty)
+        {
+            query = query.Where(f => f.TenantId == tenantId);
+        }
+
+        var hasRecords = await query.AnyAsync(f => f.ActualDurationFromStart.HasValue, cancellationToken);
+        if (!hasRecords) return 0.0;
+
+        return await query
+            .Where(f => f.ActualDurationFromStart.HasValue)
+            .AverageAsync(f => f.ActualDurationFromStart!.Value.TotalHours, cancellationToken);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

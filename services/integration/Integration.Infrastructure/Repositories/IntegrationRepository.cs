@@ -21,7 +21,7 @@ public class IntegrationRepository : IIntegrationRepository
         return await _context.WebhookEndpoints.FirstOrDefaultAsync(e => e.Path == path && e.TenantId == tenantId);
     }
 
-    public async Task<Partner> GetPartnerByCodeAsync(string partnerCode, Guid tenantId)
+    public async Task<IntegrationPartner> GetPartnerByCodeAsync(string partnerCode, Guid tenantId)
     {
         return await _context.Partners.FirstOrDefaultAsync(p => p.PartnerCode == partnerCode && p.TenantId == tenantId);
     }

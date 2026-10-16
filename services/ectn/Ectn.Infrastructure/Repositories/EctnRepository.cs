@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Ectn.Domain.Entities;
+using EctnEntity = Ectn.Domain.Entities.Ectn;
 using Ectn.Domain.Repositories;
 using Ectn.Infrastructure.Persistence;
 
@@ -16,18 +16,18 @@ public class EctnRepository : IEctnRepository
         _context = context;
     }
 
-    public async Task<Ectn> GetByIdAsync(Guid id, Guid tenantId)
+    public async Task<EctnEntity?> GetByIdAsync(Guid id, Guid tenantId)
     {
         return await _context.Ectns
             .FirstOrDefaultAsync(e => e.Id == id && e.TenantId == tenantId);
     }
 
-    public async Task AddAsync(Ectn ectn)
+    public async Task AddAsync(EctnEntity ectn)
     {
         await _context.Ectns.AddAsync(ectn);
     }
 
-    public async Task UpdateAsync(Ectn ectn)
+    public async Task UpdateAsync(EctnEntity ectn)
     {
         _context.Ectns.Update(ectn);
         await Task.CompletedTask;

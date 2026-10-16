@@ -1,13 +1,13 @@
 using System;
 using System.Threading.Tasks;
-using Ectn.Domain.Entities;
+using EctnEntity = Ectn.Domain.Entities.Ectn;
 
 namespace Ectn.Domain.Repositories;
 
 public interface IEctnRepository
 {
-    Task<Ectn> GetByIdAsync(Guid id, Guid tenantId);
-    Task AddAsync(Ectn ectn);
-    Task UpdateAsync(Ectn ectn);
+    Task<EctnEntity?> GetByIdAsync(Guid id, Guid tenantId);
+    Task AddAsync(EctnEntity ectn);
+    Task UpdateAsync(EctnEntity ectn);
     Task SaveChangesAsync();
 }

@@ -8,6 +8,7 @@ public class EctnDbContext : SmartDbContext<EctnDbContext>
 {
     public EctnDbContext(DbContextOptions<EctnDbContext> options) : base(options) { }
 
+    public DbSet<Ectn.Domain.Entities.Ectn> Ectns => Set<Ectn.Domain.Entities.Ectn>();
     public DbSet<EctnApplication> EctnApplications => Set<EctnApplication>();
     public DbSet<EctnCertificate> EctnCertificates => Set<EctnCertificate>();
     public DbSet<EctnReference> EctnReferences => Set<EctnReference>();

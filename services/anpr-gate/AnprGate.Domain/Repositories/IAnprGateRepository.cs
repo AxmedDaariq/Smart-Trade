@@ -6,7 +6,7 @@ namespace AnprGate.Domain.Repositories;
 
 public interface IAnprGateRepository
 {
-    Task<RecognitionEvent> GetRecognitionByIdAsync(Guid id);
-    Task AddRecognitionAsync(RecognitionEvent recognition);
+    Task<AnprRecognitionEvent?> GetRecognitionByIdAsync(Guid id);
+    Task AddRecognitionAsync(AnprRecognitionEvent recognition);
     Task SaveChangesAsync();
 }
