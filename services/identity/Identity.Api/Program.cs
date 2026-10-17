@@ -32,6 +32,7 @@ builder.Services.Configure<JwtTokenOptions>(builder.Configuration.GetSection(Jwt
 builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IIdentityAuthService, IdentityAuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddPlatformJwtAuthentication(builder.Configuration);
 

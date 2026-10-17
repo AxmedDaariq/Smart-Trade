@@ -60,11 +60,35 @@ class ApiClient {
       },
       onError: (DioException e, handler) async {
         if (e.response?.statusCode == 401) {
-          // Attempt token refresh logic here
-          // If refresh fails, clear session and throw specific AuthException
-          await _secureStorage.delete(key: _tokenKey);
-          await _secureStorage.delete(key: _refreshTokenKey);
-          // throw AuthException('Session expired');
+          final success = await refreshToken();
+          if (success) {
+            // Retry the original request with the new token
+            final options = e.requestOptions;
+            final token = await _secureStorage.read(key: _tokenKey);
+            options.headers['Authorization'] = 'Bearer $token';
+
+            try {
+              final response = await _dio.request(
+                options.path,
+                data: options.data,
+                queryParameters: options.queryParameters,
+                options: Options(
+                  method: options.method,
+                  headers: options.headers,
+                ),
+              );
+              return handler.resolve(response);
+            } catch (retryError) {
+              return handler.next(retryError is DioException ? retryError : DioException(
+                requestOptions: options,
+                error: retryError,
+              ));
+            }
+          } else {
+            await _secureStorage.delete(key: _tokenKey);
+            await _secureStorage.delete(key: _refreshTokenKey);
+            return handler.next(e);
+          }
         }
         return handler.next(e);
       },

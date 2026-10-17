@@ -248,4 +248,137 @@ public sealed class AuthControllerTests
 
         svc.Verify(s => s.RevokeRefreshTokenAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    // ─── ForgotPassword ────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ForgotPassword_ValidEmail_Returns200()
+    {
+        // Arrange
+        var (svc, ctx) = BuildContext();
+        svc.Setup(s => s.RequestPasswordResetAsync("admin@acme.com", It.IsAny<CancellationToken>()))
+           .Returns(Task.CompletedTask);
+
+        var controller = new Identity.Api.Controllers.AuthController(svc.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = ctx }
+        };
+
+        // Act
+        var result = await controller.ForgotPassword(new Identity.Api.Controllers.ForgotPasswordRequest("admin@acme.com"), CancellationToken.None);
+
+        // Assert
+        var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.StatusCode.Should().Be(200);
+        svc.Verify(s => s.RequestPasswordResetAsync("admin@acme.com", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task ForgotPassword_InvalidEmail_Returns400(string? email)
+    {
+        // Arrange
+        var (svc, ctx) = BuildContext();
+        var controller = new Identity.Api.Controllers.AuthController(svc.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = ctx }
+        };
+
+        var request = email is null ? null : new Identity.Api.Controllers.ForgotPasswordRequest(email);
+
+        // Act
+        var result = await controller.ForgotPassword(request, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>()
+              .Which.StatusCode.Should().Be(400);
+        svc.Verify(s => s.RequestPasswordResetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ─── ResetPassword ─────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ResetPassword_ValidToken_Returns200()
+    {
+        // Arrange
+        var (svc, ctx) = BuildContext();
+        svc.Setup(s => s.ResetPasswordAsync("valid_token", "NewPassword123!", It.IsAny<CancellationToken>()))
+           .ReturnsAsync(true);
+
+        var controller = new Identity.Api.Controllers.AuthController(svc.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = ctx }
+        };
+
+        // Act
+        var result = await controller.ResetPassword(new Identity.Api.Controllers.ResetPasswordRequest("valid_token", "NewPassword123!"), CancellationToken.None);
+
+        // Assert
+        var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.StatusCode.Should().Be(200);
+    }
+
+    [Fact]
+    public async Task ResetPassword_InvalidOrExpiredToken_Returns400()
+    {
+        // Arrange
+        var (svc, ctx) = BuildContext();
+        svc.Setup(s => s.ResetPasswordAsync("expired_token", "NewPassword123!", It.IsAny<CancellationToken>()))
+           .ReturnsAsync(false);
+
+        var controller = new Identity.Api.Controllers.AuthController(svc.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = ctx }
+        };
+
+        // Act
+        var result = await controller.ResetPassword(new Identity.Api.Controllers.ResetPasswordRequest("expired_token", "NewPassword123!"), CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>()
+              .Which.StatusCode.Should().Be(400);
+    }
+
+    [Theory]
+    [InlineData(null, "NewPassword123!")]
+    [InlineData("valid_token", null)]
+    [InlineData("", "")]
+    public async Task ResetPassword_MissingFields_Returns400(string? token, string? newPassword)
+    {
+        // Arrange
+        var (svc, ctx) = BuildContext();
+        var controller = new Identity.Api.Controllers.AuthController(svc.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = ctx }
+        };
+
+        var request = token is null && newPassword is null ? null : new Identity.Api.Controllers.ResetPasswordRequest(token ?? "", newPassword ?? "");
+
+        // Act
+        var result = await controller.ResetPassword(request, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>()
+              .Which.StatusCode.Should().Be(400);
+    }
+
+    [Fact]
+    public async Task Login_MissingCommand_Returns400()
+    {
+        // Arrange
+        var (svc, ctx) = BuildContext();
+        var controller = new Identity.Api.Controllers.AuthController(svc.Object)
+        {
+            ControllerContext = new ControllerContext { HttpContext = ctx }
+        };
+
+        // Act
+        var result = await controller.Login(null, CancellationToken.None);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>()
+              .Which.StatusCode.Should().Be(400);
+    }
 }

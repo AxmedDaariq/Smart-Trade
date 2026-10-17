@@ -23,9 +23,14 @@ public sealed class AuthController : ControllerBase
     [HttpPost("login")]
     [EnableRateLimiting("identity-auth")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Login([FromBody] LoginCommand? command, CancellationToken cancellationToken)
     {
+        if (command is null || string.IsNullOrWhiteSpace(command.TenantCode) || string.IsNullOrWhiteSpace(command.Email) || string.IsNullOrWhiteSpace(command.Password))
+            return BadRequest(new { error = "Tenant code, email, and password are required." });
+
         var result = await _authService.LoginAsync(command, ClientIpAddress(), Request.Headers["User-Agent"].ToString(), cancellationToken);
         if (result is null) return Unauthorized(new { error = "Invalid credentials or account unavailable." });
         if (result.RequiresMfa)
@@ -65,9 +70,30 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("forgot-password")]
     [EnableRateLimiting(PlatformSecurityExtensions.SensitiveRateLimitPolicy)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    public IActionResult ForgotPassword() =>
-        StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Password recovery is not configured." });
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest? request, CancellationToken cancellationToken)
+    {
+        if (request is null || string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(new { error = "Email is required." });
+
+        await _authService.RequestPasswordResetAsync(request.Email, cancellationToken);
+        return Ok(new { message = "If an account is associated with this email, a reset link has been sent." });
+    }
+
+    [HttpPost("reset-password")]
+    [EnableRateLimiting(PlatformSecurityExtensions.SensitiveRateLimitPolicy)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest? request, CancellationToken cancellationToken)
+    {
+        if (request is null || string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(new { error = "Token and new password are required." });
+
+        var success = await _authService.ResetPasswordAsync(request.Token, request.NewPassword, cancellationToken);
+        if (!success) return BadRequest(new { error = "Invalid or expired reset token." });
+        return Ok(new { message = "Password successfully reset." });
+    }
 
     private static LoginResponse ToResponse(LoginResult result) => new(
         result.AccessToken, result.ExpiresAtUtc, result.TenantType, result.Roles, result.Permissions, result.TenantCode);

@@ -33,7 +33,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: AppColors.textMain),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.bgCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -97,7 +97,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.bgSurface.withValues(alpha: 0.8),
+        fillColor: AppColors.bgSurface.withOpacity(0.8),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
         border: OutlineInputBorder(

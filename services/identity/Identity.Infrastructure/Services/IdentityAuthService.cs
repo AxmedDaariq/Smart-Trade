@@ -20,15 +20,17 @@ public sealed class IdentityAuthService : IIdentityAuthService
     private readonly IJwtTokenGenerator _tokens;
     private readonly JwtTokenOptions _jwtOptions;
     private readonly ILogger<IdentityAuthService> _logger;
+    private readonly IEmailService? _emailService;
 
     public IdentityAuthService(IdentityDbContext db, IPasswordHasher passwordHasher, IJwtTokenGenerator tokens,
-        IOptions<JwtTokenOptions> jwtOptions, ILogger<IdentityAuthService> logger)
+        IOptions<JwtTokenOptions> jwtOptions, ILogger<IdentityAuthService> logger, IEmailService? emailService = null)
     {
         _db = db;
         _passwordHasher = passwordHasher;
         _tokens = tokens;
         _jwtOptions = jwtOptions.Value;
         _logger = logger;
+        _emailService = emailService;
     }
 
     public async Task<LoginResult?> LoginAsync(LoginCommand command, string ipAddress, string userAgent, CancellationToken cancellationToken)
@@ -258,5 +260,72 @@ public sealed class IdentityAuthService : IIdentityAuthService
             session.RevokedAtUtc = now;
             session.RevocationReason = reason;
         }
+    }
+
+    public async Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return;
+
+        var normalizedEmail = email.Trim().ToUpperInvariant();
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+
+        // A07: Return a generic response to prevent account enumeration.
+        if (user is null)
+        {
+            _logger.LogInformation("Password reset requested for non-existent email: {Email}", email);
+            return;
+        }
+
+        var rawToken = _tokens.GenerateRefreshToken();
+        var tokenHash = _tokens.HashToken(rawToken);
+
+        var resetToken = new PasswordResetToken
+        {
+            UserId = user.Id,
+            TokenHash = tokenHash,
+            ExpiresAtUtc = DateTime.UtcNow.AddHours(24),
+            Status = "Active",
+            CreatedAtUtc = DateTime.UtcNow
+        };
+
+        _db.PasswordResetTokens.Add(resetToken);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        // In a real app, the link would be something like: https://auth.platform.com/reset-password?token=rawToken
+        if (_emailService != null)
+        {
+            await _emailService.SendEmailAsync(
+                user.Email,
+                "Password Reset Request",
+                $"Your password reset token is: {rawToken}. This token expires in 24 hours.");
+        }
+
+        _logger.LogInformation("Password reset token generated and sent to {Email}", email);
+    }
+
+    public async Task<bool> ResetPasswordAsync(string token, string newPassword, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(newPassword)) return false;
+
+        var tokenHash = _tokens.HashToken(token);
+        var resetToken = await _db.PasswordResetTokens
+            .SingleOrDefaultAsync(t => t.TokenHash == tokenHash && t.Status == "Active", cancellationToken);
+
+        if (resetToken is null || resetToken.ExpiresAtUtc <= DateTime.UtcNow)
+        {
+            _logger.LogWarning("Invalid or expired password reset token provided.");
+            return false;
+        }
+
+        var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == resetToken.UserId, cancellationToken);
+        if (user is null) return false;
+
+        user.PasswordHash = _passwordHasher.HashPassword(newPassword);
+        resetToken.Status = "Used";
+        resetToken.UsedAtUtc = DateTime.UtcNow;
+
+        await _db.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Password successfully reset for user {UserId}", user.Id);
+        return true;
     }
 }

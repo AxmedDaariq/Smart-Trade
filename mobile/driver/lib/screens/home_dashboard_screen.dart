@@ -54,16 +54,27 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.notifications_active, color: AppColors.warningLight, size: 20),
+                      Icon(
+                        Icons.notifications_active,
+                        color: AppColors.warningLight,
+                        size: 20,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'Corridor Incident Notifications',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textMain),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textMain,
+                        ),
                       ),
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                    ),
                     onPressed: () => Navigator.pop(ctx),
                   ),
                 ],
@@ -74,11 +85,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: alerts.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (ctx, index) {
                   final alert = alerts[index];
                   final isWarning = alert.severity == 'warning';
-                  final color = isWarning ? AppColors.warningLight : AppColors.cyanLight;
+                  final color = isWarning
+                      ? AppColors.warningLight
+                      : AppColors.cyanLight;
                   return Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -92,14 +105,40 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(alert.title, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w700)),
-                            Text(alert.timestamp, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                            Text(
+                              alert.title,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              alert.timestamp,
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 11,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(alert.location, style: const TextStyle(color: AppColors.textMain, fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text(
+                          alert.location,
+                          style: const TextStyle(
+                            color: AppColors.textMain,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         const SizedBox(height: 2),
-                        Text(alert.description, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                        Text(
+                          alert.description,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -141,9 +180,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               decoration: BoxDecoration(
                 color: AppColors.primaryGlow,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.5)),
+                border: Border.all(
+                  color: AppColors.primaryLight.withValues(alpha: 0.5),
+                ),
               ),
-              child: const Icon(Icons.public, color: AppColors.cyanLight, size: 20),
+              child: const Icon(
+                Icons.public,
+                color: AppColors.cyanLight,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -162,15 +207,24 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                     const SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: AppColors.primaryLight.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: const Text(
                         'MOBILE',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppColors.cyanLight),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.cyanLight,
+                        ),
                       ),
                     ),
                   ],
@@ -203,7 +257,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 SizedBox(width: 4),
                 Text(
                   'ST-EAST',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -213,7 +271,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.notifications_none, color: AppColors.textMain, size: 22),
+                const Icon(
+                  Icons.notifications_none,
+                  color: AppColors.textMain,
+                  size: 22,
+                ),
                 Positioned(
                   top: -2,
                   right: -2,
@@ -233,10 +295,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           const SizedBox(width: 4),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: tabs,
-      ),
+      body: IndexedStack(index: _currentIndex, children: tabs),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.bgSurface,

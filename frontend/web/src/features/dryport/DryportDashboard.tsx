@@ -35,9 +35,11 @@ export const DryportDashboard: React.FC = () => {
   const handleContainerSubmit = async (data: any) => {
     try {
       await addContainer(data);
-      console.log("Kunteenar cusub ayaa la diiwaangeliyay");
+      // Log removed for production security (A05)
+
     } catch (err) {
-      console.error("Cilad ayaa dhacday marka la kaydinayay kunteenarka:", err);
+      // Log removed for production security (A05)
+
       alert("Cilad ayaa dhacday: Kunteenarka lama kaydin");
     }
   };
