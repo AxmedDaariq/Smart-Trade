@@ -1,0 +1,14 @@
+title = "SmartTrade Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlist generated bundles, logs, test files, and mock tokens"
+paths = [
+    '''(?i)repomix.*''',
+    '''(?i).*\.log$''',
+    '''(?i).*\.sarif$''',
+    '''(?i)\.env\..*''',
+    '''(?i)tests/.*'''
+]

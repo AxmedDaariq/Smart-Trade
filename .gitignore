@@ -42,3 +42,7 @@ scripts/db-maintenance/backups/
 # === OS / System ===
 C:\Users\Tariq\.claude/
 .claude/
+
+# === Bundles & Large Dumps ===
+repomix*
+*-output.txt

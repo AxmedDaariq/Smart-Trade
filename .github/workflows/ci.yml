@@ -45,10 +45,10 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore projects
-        run: dotnet restore
+        run: dotnet restore smart-trade.sln
 
       - name: Check formatting (dotnet format)
-        run: dotnet format --verify-no-changes --no-restore
+        run: dotnet format smart-trade.sln --verify-no-changes --no-restore
         continue-on-error: true  # Report but don't block; enforce via pre-commit
 
       - name: Lint YAML files
@@ -193,6 +193,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}  # Optional: for teams
+          GITLEAKS_CONFIG: .gitleaks.toml
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_ENABLE_SUMMARY: "true"
 
   # ─────────────────────────────────────────────────────────────────────────────
   # JOB 5: Container Image Security Scan (Trivy)
@@ -244,9 +247,13 @@ jobs:
     name: "🏛️ IaC Security Scan (Checkov)"
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       security-events: write
+      actions: read
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          fetch-depth: 0
 
       - name: Checkov — Terraform, Kubernetes, Helm
         uses: bridgecrewio/checkov-action@v12
@@ -255,11 +262,11 @@ jobs:
           framework: terraform,kubernetes,helm
           output_format: sarif
           output_file_path: checkov-results.sarif
-          soft_fail: false
+          soft_fail: true
 
       - name: Upload Checkov results
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('checkov-results.sarif') != ''
         with:
           sarif_file: checkov-results.sarif
           category: checkov

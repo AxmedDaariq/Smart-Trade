@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore smart-trade.sln
 
       - name: Build Application
-        run: dotnet build --configuration Release
+        run: dotnet build smart-trade.sln --configuration Release
 
   # 2. Testing Pyramid (Unit -> Integration -> E2E)
   test-suite:

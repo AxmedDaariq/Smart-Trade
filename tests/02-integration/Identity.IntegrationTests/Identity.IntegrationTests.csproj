@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Identity.IntegrationTests</AssemblyName>
     <RootNamespace>Identity.IntegrationTests</RootNamespace>
   </PropertyGroup>
@@ -16,12 +17,12 @@
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="3.6.0" />
-    <PackageReference Include="Testcontainers.Redis" Version="3.6.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="3.8.0" />
     <ProjectReference Include="..\Shared\Shared.IntegrationTests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\services\identity\Identity.Api\Identity.Api.csproj" />
+    <ProjectReference Include="..\..\..\services\identity\Identity.Api\Identity.Api.csproj" />
   </ItemGroup>
 </Project>
