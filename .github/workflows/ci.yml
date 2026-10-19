@@ -54,11 +54,7 @@ jobs:
       - name: Lint YAML files
         uses: ibiqlik/action-yamllint@v3
         with:
-          config_data: |
-            extends: default
-            rules:
-              line-length:
-                max: 120
+          config_file: .yamllint.yml
 
       - name: Lint Dockerfiles
         uses: hadolint/hadolint-action@v3.1.0
@@ -98,7 +94,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: nuget-${{ runner.os }}-${{ matrix.service }}-${{ hashFiles(format('services/{0}/**/*.csproj', matrix.service)) }}
+          key: >-
+            ${{ format('nuget-{0}-{1}-{2}',
+              runner.os,
+              matrix.service,
+              hashFiles(format('services/{0}/**/*.csproj', matrix.service))) }}
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore ${{ matrix.service }}

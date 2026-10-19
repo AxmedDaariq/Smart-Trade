@@ -3,7 +3,6 @@ import '../../models/logistics_models.dart';
 import '../../services/mock_data_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/glass_card.dart';
-import '../../widgets/metric_card.dart';
 import '../../widgets/status_badge.dart';
 
 class SyncProfileTab extends StatefulWidget {
@@ -213,7 +212,7 @@ class _SyncProfileTabState extends State<SyncProfileTab> {
                 letterSpacing: 0.6,
               ),
             ),
-            StatusBadge.purple('${_pendingEvents} In Queue'),
+            StatusBadge.purple('$_pendingEvents In Queue'),
           ],
         ),
         const SizedBox(height: 10),

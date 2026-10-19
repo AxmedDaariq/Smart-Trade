@@ -19,7 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [identity, customs, shipping, payment, notification, fleet, gps, audit, declaration, analytics, corridor, dryport, ectn, anpr-gate, ais-vessel, integration]
+        service:
+          - identity
+          - customs
+          - shipping
+          - payment
+          - notification
+          - fleet
+          - gps
+          - audit
+          - declaration
+          - analytics
+          - corridor
+          - dryport
+          - ectn
+          - anpr-gate
+          - ais-vessel
+          - integration
       fail-fast: false
     steps:
       - uses: actions/checkout@v4.4.0
@@ -36,7 +52,8 @@ jobs:
       - name: Run Trivy on ${{ matrix.service }}
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/smart-trade/${{ matrix.service }}:latest"
+          image-ref: >-
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/smart-trade/${{ matrix.service }}:latest
           format: sarif
           output: trivy-${{ matrix.service }}.sarif
           severity: CRITICAL,HIGH

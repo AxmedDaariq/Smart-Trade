@@ -28,7 +28,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("ConnectionStrings:DefaultConnection is required.");
 
-builder.Services.AddDbContext<CorridorDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<CorridorDbContext>(options => options.UseNpgsql(connectionString, o => o.UseNetTopologySuite()));
 builder.Services.AddScoped<ICorridorDbContext>(sp => sp.GetRequiredService<CorridorDbContext>());
 
 var app = builder.Build();
@@ -49,6 +49,18 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/health/live", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
+app.MapGet("/health/ready", async (CorridorDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        if (await db.Database.CanConnectAsync(ct)) return (IResult)Results.Ok(new { status = "ready" });
+        return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+    catch
+    {
+        return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+}).AllowAnonymous();
 
 app.Run();
 

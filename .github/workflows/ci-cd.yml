@@ -43,7 +43,8 @@ jobs:
         run: |
           find . -name '*.csproj' -not -path '*/obj/*' -not -path '*/bin/*' \
           | grep -Ei 'Tests\.csproj$' \
-          | xargs -I {} dotnet test {} --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
+          | xargs -I {} dotnet test {} --no-build --configuration Release \
+            --verbosity normal --collect:"XPlat Code Coverage"
 
   docker-build-push:
     needs: build-and-test

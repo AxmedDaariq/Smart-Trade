@@ -24,7 +24,7 @@ spec:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: ectn-vault-secrets # Bound via Vault Agent Injector
+                name: ectn-vault-secrets  # Bound via Vault Agent Injector
           resources:
             requests:
               cpu: "100m"

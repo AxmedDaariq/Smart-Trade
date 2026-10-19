@@ -2,9 +2,9 @@ name: Smart Trade Logistics Enterprise CI/CD
 
 on:
   push:
-    branches: [ main, testing ]
+    branches: [main, testing]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   # 1. Build and Static Analysis
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      
+
       - name: Run Unit Tests
         run: dotnet test tests/01-unit
 
@@ -66,16 +66,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Run OWASP ZAP Security Scan
         run: |
           docker run --rm -v $(pwd):/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py \
           -t http://localhost:5000 -r zap_report.html
-          
+
       - name: Run JMeter Performance Baseline
         run: |
           # This assumes jmeter is installed on the runner or uses a docker image
-          docker run --rm -v $(pwd):/tests jmeter/jmeter -n -t tests/04-performance/jmeter/scripts/load_test_platform.jmx -l results.jtl
+          docker run --rm -v $(pwd):/tests jmeter/jmeter \
+            -n -t tests/04-performance/jmeter/scripts/load_test_platform.jmx -l results.jtl
 
   # 4. Infrastructure & Deployment (CD)
   deploy-staging:
@@ -84,13 +85,13 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Deploy to K8s Staging
         run: |
           echo "Applying Kubernetes Manifests..."
           # kubectl apply -f k8s/deployment.yaml
           # kubectl apply -f tests/06-infrastructure/k8s-validation/readiness_liveness.yaml
-          
+
       - name: Post-Deploy Health Check
         run: |
           python3 tests/06-infrastructure/health-checks/global_health_check.py

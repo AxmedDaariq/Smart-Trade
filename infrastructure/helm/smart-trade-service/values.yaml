@@ -118,15 +118,15 @@ initContainers: []
 
 # ─── Config & Secrets ─────────────────────────────────────────────────────────
 env: {}
-  # ASPNETCORE_ENVIRONMENT: "Production"
-  # ASPNETCORE_URLS: "http://+:8080"
+# ASPNETCORE_ENVIRONMENT: "Production"
+# ASPNETCORE_URLS: "http://+:8080"
 
 secretEnv: []
-  # - name: ConnectionStrings__DefaultConnection
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: db-credentials
-  #       key: connection-string
+# - name: ConnectionStrings__DefaultConnection
+#   valueFrom:
+#     secretKeyRef:
+#       name: db-credentials
+#       key: connection-string
 
 # ─── HashiCorp Vault ──────────────────────────────────────────────────────────
 vault:

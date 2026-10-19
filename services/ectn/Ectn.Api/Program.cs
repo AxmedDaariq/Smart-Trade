@@ -74,3 +74,5 @@ app.MapGet("/health/ready", async (EctnDbContext db, CancellationToken ct) =>
 }).AllowAnonymous();
 
 app.Run();
+
+public partial class Program { }

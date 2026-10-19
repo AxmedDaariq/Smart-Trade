@@ -16,7 +16,7 @@ public class EctnApiFactory : BaseIntegrationTestFactory<Program>
         await MigrateDatabaseAsync(async sp =>
         {
             var db = sp.GetRequiredService<EctnDbContext>();
-            await db.Database.MigrateAsync();
+            await db.Database.EnsureCreatedAsync();
         });
     }
 }

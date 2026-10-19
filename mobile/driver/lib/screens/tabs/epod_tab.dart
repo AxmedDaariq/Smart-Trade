@@ -29,7 +29,6 @@ class _EpodTabState extends State<EpodTab> {
   final TextEditingController _receiverTerminalCtrl = TextEditingController(text: 'Mojo Dryport Warehouse Gate 3');
 
   bool _hasSignature = false;
-  bool _isSubmitted = false;
   int _photosAttached = 2;
 
   @override
@@ -60,8 +59,6 @@ class _EpodTabState extends State<EpodTab> {
       );
       return;
     }
-
-    setState(() => _isSubmitted = true);
 
     showDialog(
       context: context,
@@ -112,7 +109,6 @@ class _EpodTabState extends State<EpodTab> {
             onPressed: () {
               Navigator.pop(ctx);
               setState(() {
-                _isSubmitted = false;
                 _sigKey.currentState?.clear();
                 _hasSignature = false;
               });

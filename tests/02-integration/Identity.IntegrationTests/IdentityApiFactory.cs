@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Shared.IntegrationTests;
@@ -23,7 +24,7 @@ public class IdentityApiFactory : BaseIntegrationTestFactory<Program>
         await MigrateDatabaseAsync(async sp =>
         {
             var db = sp.GetRequiredService<IdentityDbContext>();
-            await db.Database.MigrateAsync();
+            await db.Database.EnsureCreatedAsync();
         });
     }
 }

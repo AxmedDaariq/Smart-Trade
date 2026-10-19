@@ -15,8 +15,8 @@ public class AnprGateApiFactory : BaseIntegrationTestFactory<Program>
     {
         await MigrateDatabaseAsync(async sp =>
         {
-            var db = sp.GetRequiredService<AnprGateDbContext>();
-            await db.Database.MigrateAsync();
+            var db = sp.GetRequiredService<AnprDbContext>();
+            await db.Database.EnsureCreatedAsync();
         });
     }
 }

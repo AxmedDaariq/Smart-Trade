@@ -73,15 +73,21 @@ jobs:
         id: set-matrix
         run: |
           SERVICES=()
-          for svc in identity customs shipping payment notification fleet gps gps-telematics audit declaration analytics corridor dryport ectn anpr-gate ais-vessel integration; do
-            if [ "${{ steps.filter.outputs[svc] }}" == "true" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          ALL_SERVICES=(
+            identity customs shipping payment notification fleet gps
+            gps-telematics audit declaration analytics corridor dryport
+            ectn anpr-gate ais-vessel integration
+          )
+          for svc in "${ALL_SERVICES[@]}"; do
+            if [ "${{ steps.filter.outputs[svc] }}" == "true" ] || \
+               [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
               SERVICES+=("{\"service\":\"${svc}\"}")
             fi
           done
           # Force rebuild all on tag push
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             SERVICES=()
-            for svc in identity customs shipping payment notification fleet gps gps-telematics audit declaration analytics corridor dryport ectn anpr-gate ais-vessel integration; do
+            for svc in "${ALL_SERVICES[@]}"; do
               SERVICES+=("{\"service\":\"${svc}\"}")
             done
           fi
@@ -161,7 +167,8 @@ jobs:
       - name: Run Trivy on pushed image
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: "${{ env.ECR_REGISTRY }}/smart-trade/${{ matrix.include.service }}@${{ steps.build-push.outputs.digest }}"
+          image-ref: >-
+            ${{ env.ECR_REGISTRY }}/smart-trade/${{ matrix.include.service }}@${{ steps.build-push.outputs.digest }}
           format: table
           severity: CRITICAL
           exit-code: "1"
@@ -347,7 +354,8 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_CHANNEL: "#deployments"
-          SLACK_COLOR: ${{ (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'danger' || 'good' }}
+          SLACK_COLOR: >-
+            ${{ (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')) && 'danger' || 'good' }}
           SLACK_ICON_EMOJI: ":rocket:"
           SLACK_USERNAME: "Smart Trade CD Bot"
           SLACK_TITLE: "Deployment — ${{ github.ref_name }}"

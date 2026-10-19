@@ -15,8 +15,8 @@ public class AisVesselApiFactory : BaseIntegrationTestFactory<Program>
     {
         await MigrateDatabaseAsync(async sp =>
         {
-            var db = sp.GetRequiredService<AisVesselDbContext>();
-            await db.Database.MigrateAsync();
+            var db = sp.GetRequiredService<AisDbContext>();
+            await db.Database.EnsureCreatedAsync();
         });
     }
 }

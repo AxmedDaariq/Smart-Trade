@@ -8,7 +8,8 @@ data:
     token: $slack-token
   template.app-deployed: |
     message: |
-      :white_check_mark: Application {{.app.metadata.name}} has been successfully synced to {{.app.status.sync.revision}}.
+      :white_check_mark: Application {{.app.metadata.name}}
+      has been successfully synced to {{.app.status.sync.revision}}.
       Health Status: {{.app.status.health.status}}
   template.app-health-degraded: |
     message: |
@@ -17,7 +18,10 @@ data:
   trigger.on-deployed: |
     - description: Application is synced and healthy
       send: [app-deployed]
-      when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+      when: >-
+        app.status.operationState != nil and
+        app.status.operationState.phase in ['Succeeded'] and
+        app.status.health.status == 'Healthy'
   trigger.on-health-degraded: |
     - description: Application health degraded
       send: [app-health-degraded]

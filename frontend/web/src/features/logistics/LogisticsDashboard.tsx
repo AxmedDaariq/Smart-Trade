@@ -32,13 +32,13 @@ export const LogisticsDashboard: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Customs Cleared':
-        return <span className="badge badge-success"><CheckCircle2 size={12} /> Cleared</span>;
+        return <span className="badge badge-success" data-cy="shipment-status-badge"><CheckCircle2 size={12} /> Cleared</span>;
       case 'In-Transit':
-        return <span className="badge badge-info"><Truck size={12} /> In Transit</span>;
+        return <span className="badge badge-info" data-cy="shipment-status-badge"><Truck size={12} /> In Transit</span>;
       case 'Border Gate':
-        return <span className="badge badge-warning"><AlertTriangle size={12} /> Border Inspection</span>;
+        return <span className="badge badge-warning" data-cy="shipment-status-badge"><AlertTriangle size={12} /> Border Inspection</span>;
       default:
-        return <span className="badge badge-info"><Ship size={12} /> Port Yard</span>;
+        return <span className="badge badge-info" data-cy="shipment-status-badge"><Ship size={12} /> Port Yard</span>;
     }
   };
 
@@ -60,10 +60,10 @@ export const LogisticsDashboard: React.FC = () => {
         </div>
 
         <div className="hero-actions">
-          <button type="button" className="btn-secondary">
+          <button type="button" className="btn-secondary" data-cy="btn-export-manifest">
             <Download size={16} /> Export Manifest
           </button>
-          <button type="button" className="btn-primary">
+          <button type="button" className="btn-primary" data-cy="btn-dispatch-consignment">
             <Plus size={16} /> Dispatch New Consignment
           </button>
         </div>
@@ -71,7 +71,7 @@ export const LogisticsDashboard: React.FC = () => {
 
       {/* KPI Stats Grid */}
       <div className="kpi-grid">
-        <div className="kpi-card">
+        <div className="kpi-card" data-cy="kpi-active-cargo">
           <div className="kpi-header">
             <span className="kpi-title">Active In-Transit Cargo</span>
             <div className="kpi-icon-wrap"><Ship size={20} /></div>
@@ -82,7 +82,7 @@ export const LogisticsDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="kpi-card kpi-success">
+        <div className="kpi-card kpi-success" data-cy="kpi-on-time-delivery">
           <div className="kpi-header">
             <span className="kpi-title">On-Time Corridor Delivery</span>
             <div className="kpi-icon-wrap"><ShieldCheck size={20} color="#10b981" /></div>
@@ -93,7 +93,7 @@ export const LogisticsDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="kpi-card kpi-warning">
+        <div className="kpi-card kpi-warning" data-cy="kpi-demurrage-risk">
           <div className="kpi-header">
             <span className="kpi-title">Demurrage Risk Flags</span>
             <div className="kpi-icon-wrap"><Clock size={20} color="#f59e0b" /></div>
@@ -104,7 +104,7 @@ export const LogisticsDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="kpi-card kpi-purple">
+        <div className="kpi-card kpi-purple" data-cy="kpi-fleet-units">
           <div className="kpi-header">
             <span className="kpi-title">Active GPS Fleet Units</span>
             <div className="kpi-icon-wrap"><Navigation size={20} color="#a855f7" /></div>
@@ -125,7 +125,7 @@ export const LogisticsDashboard: React.FC = () => {
             <div style={{ fontSize: '0.8125rem', color: '#94a3b8', marginTop: '0.2rem' }}>
               Distance: 920 km • Fast-track customs green channel enabled
             </div>
-          </span >
+            </div>
           <span className="badge badge-success">Highway Cleared</span>
         </div>
 
@@ -133,32 +133,32 @@ export const LogisticsDashboard: React.FC = () => {
           <div className="corridor-line" />
           <div className="corridor-line-progress" />
 
-          <div className="corridor-stop">
-            <div className="corridor-node passed">✓</div>
+          <div className="corridor-stop passed" data-cy="corridor-node-berbera">
+            <div className="corridor-node">✓</div>
             <div className="stop-name">Berbera Port</div>
             <div className="stop-meta">Terminal Quay</div>
           </div>
 
-          <div className="corridor-stop">
-            <div className="corridor-node passed">✓</div>
+          <div className="corridor-stop passed" data-cy="corridor-node-hargeisa">
+            <div className="corridor-node">✓</div>
             <div className="stop-name">Hargeisa Hub</div>
             <div className="stop-meta">Transit Hub</div>
           </div>
 
-          <div className="corridor-stop">
-            <div className="corridor-node current">●</div>
+          <div className="corridor-stop current" data-cy="corridor-node-togwajaale">
+            <div className="corridor-node">●</div>
             <div className="stop-name">Tog-Wajaale</div>
             <div className="stop-meta">Customs Border</div>
           </div>
 
-          <div className="corridor-stop">
-            <div className="corridor-node upcoming">○</div>
+          <div className="corridor-stop upcoming" data-cy="corridor-node-dire-dawa">
+            <div className="corridor-node">○</div>
             <div className="stop-name">Dire Dawa</div>
             <div className="stop-meta">Dryport Rail</div>
           </div>
 
-          <div className="corridor-stop">
-            <div className="corridor-node upcoming">○</div>
+          <div className="corridor-stop upcoming" data-cy="corridor-node-addis">
+            <div className="corridor-node">○</div>
             <div className="stop-name">Mojo / Addis</div>
             <div className="stop-meta">Destination ICD</div>
           </div>
@@ -176,6 +176,7 @@ export const LogisticsDashboard: React.FC = () => {
               className={`btn-secondary ${filter === 'All' ? 'active' : ''}`}
               onClick={() => setFilter('All')}
               style={{ padding: '0.4rem 0.8rem', fontSize: '0.8125rem' }}
+              data-cy="filter-all"
             >
               All ({shipments.length})
             </button>
@@ -184,6 +185,7 @@ export const LogisticsDashboard: React.FC = () => {
               className="btn-secondary"
               onClick={() => setFilter('In-Transit')}
               style={{ padding: '0.4rem 0.8rem', fontSize: '0.8125rem' }}
+              data-cy="filter-in-transit"
             >
               In Transit
             </button>
@@ -192,6 +194,7 @@ export const LogisticsDashboard: React.FC = () => {
               className="btn-secondary"
               onClick={() => setFilter('Border')}
               style={{ padding: '0.4rem 0.8rem', fontSize: '0.8125rem' }}
+              data-cy="filter-border"
             >
               Border Gate
             </button>
@@ -213,7 +216,7 @@ export const LogisticsDashboard: React.FC = () => {
             </thead>
             <tbody>
               {filteredShipments.map((shp) => (
-                <tr key={shp.id}>
+                <tr key={shp.id} data-cy="shipment-table-row">
                   <td>
                     <span className="tracking-num">{shp.trackingNumber}</span>
                   </td>
@@ -237,7 +240,7 @@ export const LogisticsDashboard: React.FC = () => {
                     {shp.eta}
                   </td>
                   <td>
-                    <span className="action-link">
+                    <span className="action-link" data-cy="shipment-action-link">
                       Inspect Details <ExternalLink size={12} style={{ display: 'inline', marginLeft: '2px' }} />
                     </span>
                   </td>

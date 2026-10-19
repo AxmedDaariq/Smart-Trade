@@ -16,7 +16,7 @@ public class IntegrationApiFactory : BaseIntegrationTestFactory<Program>
         await MigrateDatabaseAsync(async sp =>
         {
             var db = sp.GetRequiredService<IntegrationDbContext>();
-            await db.Database.MigrateAsync();
+            await db.Database.EnsureCreatedAsync();
         });
     }
 }

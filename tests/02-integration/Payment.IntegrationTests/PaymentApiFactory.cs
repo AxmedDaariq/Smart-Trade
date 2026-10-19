@@ -16,7 +16,7 @@ public class PaymentApiFactory : BaseIntegrationTestFactory<Program>
         await MigrateDatabaseAsync(async sp =>
         {
             var db = sp.GetRequiredService<PaymentDbContext>();
-            await db.Database.MigrateAsync();
+            await db.Database.EnsureCreatedAsync();
         });
     }
 }

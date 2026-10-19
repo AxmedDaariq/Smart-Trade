@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,11 @@ public abstract class BaseIntegrationTestFactory<TProgram> : WebApplicationFacto
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "ConnectionStrings:DefaultConnection", _containerFixture.GetPostgresConnectionString() },
-                { "Redis:ConnectionString", _containerFixture.GetRedisConnectionString() }
+                { "ConnectionStrings:ShippingDb", _containerFixture.GetPostgresConnectionString() },
+                { "Redis:ConnectionString", _containerFixture.GetRedisConnectionString() },
+                { "Jwt:Secret", "IntegrationTestingSuperSecretKeyWithAtLeast32BytesLength!" },
+                { "Jwt:Issuer", "smart-trade-identity" },
+                { "Jwt:Audience", "smart-trade-platform" }
             });
         });
     }

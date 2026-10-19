@@ -68,6 +68,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGet("/health/live", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
+app.MapGet("/health/ready", async (ShippingDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        if (await db.Database.CanConnectAsync(ct)) return (IResult)Results.Ok(new { status = "ready" });
+        return Results.Problem(statusCode: Microsoft.AspNetCore.Http.StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+    catch
+    {
+        return Results.Problem(statusCode: Microsoft.AspNetCore.Http.StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+}).AllowAnonymous();
 
 app.Run();
 

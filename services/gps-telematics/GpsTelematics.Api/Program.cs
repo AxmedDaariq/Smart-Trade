@@ -32,7 +32,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IngestTelemetryCommand).Assembly));
 
-builder.Services.AddDbContext<GpsDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<GpsDbContext>(options => options.UseNpgsql(connectionString, o => o.UseNetTopologySuite()));
 
 builder.Services.AddScoped<ITelemetryIngestionRepository, TelemetryIngestionRepository>();
 

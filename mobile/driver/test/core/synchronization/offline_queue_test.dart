@@ -27,14 +27,14 @@ class _InMemoryQueueRepository implements IOfflineQueueRepository {
 
   @override
   Future<List<OfflineEvent>> getPendingEvents() async =>
-      events.where((e) => e.status == OfflineEventStatus.Pending).toList();
+      events.where((e) => e.status == OfflineEventStatus.pending).toList();
 
   @override
   Future<void> updateEventStatus(
     String localId,
     OfflineEventStatus status,
   ) async {
-    if (status == OfflineEventStatus.Succeeded &&
+    if (status == OfflineEventStatus.succeeded &&
         failSucceededFor.contains(localId)) {
       throw StateError('simulated API rejection for $localId');
     }
@@ -61,10 +61,10 @@ OfflineEvent _event({String eventType = 'delivery.picked_up'}) =>
 
 void main() {
   group('OfflineEvent', () {
-    test('starts Pending with zero retries and a UTC timestamp', () {
+    test('starts pending with zero retries and a UTC timestamp', () {
       final event = _event();
 
-      expect(event.status, OfflineEventStatus.Pending);
+      expect(event.status, OfflineEventStatus.pending);
       expect(event.retryCount, 0);
       expect(event.errorCode, isNull);
       expect(event.createdAtUtc.isUtc, isTrue);
@@ -90,15 +90,15 @@ void main() {
 
       await OfflineSyncEngine(repo).syncPendingEvents();
 
-      expect(first.status, OfflineEventStatus.Succeeded);
-      expect(second.status, OfflineEventStatus.Succeeded);
+      expect(first.status, OfflineEventStatus.succeeded);
+      expect(second.status, OfflineEventStatus.succeeded);
       expect(first.retryCount, 0);
       expect(second.retryCount, 0);
       expect(repo.transitions, <String>[
-        '${first.localId}:Sending',
-        '${first.localId}:Succeeded',
-        '${second.localId}:Sending',
-        '${second.localId}:Succeeded',
+        '${first.localId}:sending',
+        '${first.localId}:succeeded',
+        '${second.localId}:sending',
+        '${second.localId}:succeeded',
       ]);
     });
 
@@ -113,9 +113,9 @@ void main() {
 
       // The failed event never reaches Succeeded and gets one retry logged…
       expect(failing.retryCount, 1);
-      expect(failing.status, OfflineEventStatus.Sending);
+      expect(failing.status, OfflineEventStatus.sending);
       // …while the engine still processes the remaining events.
-      expect(healthy.status, OfflineEventStatus.Succeeded);
+      expect(healthy.status, OfflineEventStatus.succeeded);
       expect(healthy.retryCount, 0);
     });
 
@@ -130,18 +130,18 @@ void main() {
 
     test('skips events that are not Pending', () async {
       final alreadySucceeded = _event()
-        ..status = OfflineEventStatus.Succeeded;
+        ..status = OfflineEventStatus.succeeded;
       final pending = _event(eventType: 'delivery.delivered');
       final repo = _InMemoryQueueRepository([alreadySucceeded, pending]);
 
       await OfflineSyncEngine(repo).syncPendingEvents();
 
       expect(repo.transitions, <String>[
-        '${pending.localId}:Sending',
-        '${pending.localId}:Succeeded',
+        '${pending.localId}:sending',
+        '${pending.localId}:succeeded',
       ]);
       // The already-completed event was never touched.
-      expect(alreadySucceeded.status, OfflineEventStatus.Succeeded);
+      expect(alreadySucceeded.status, OfflineEventStatus.succeeded);
       expect(alreadySucceeded.retryCount, 0);
     });
 
@@ -158,8 +158,8 @@ void main() {
       // Second pass: only Pending events are fetched, and the failed one
       // is stuck in Sending, so it is neither retried nor transitioned.
       expect(failing.retryCount, 1);
-      expect(failing.status, OfflineEventStatus.Sending);
-      expect(repo.transitions, <String>['${failing.localId}:Sending']);
+      expect(failing.status, OfflineEventStatus.sending);
+      expect(repo.transitions, <String>['${failing.localId}:sending']);
     });
   });
 }

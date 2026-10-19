@@ -32,7 +32,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AllocateBerthCommand).Assembly));
 
-builder.Services.AddDbContext<AisDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AisDbContext>(options => options.UseNpgsql(connectionString, o => o.UseNetTopologySuite()));
 
 builder.Services.AddScoped<IBerthAllocationRepository, BerthAllocationRepository>();
 

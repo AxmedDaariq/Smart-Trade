@@ -20,7 +20,6 @@ class CockpitTab extends StatefulWidget {
 class _CockpitTabState extends State<CockpitTab> {
   final TelemetryData _telemetry = MockDataService.activeTelemetry;
   final ShipmentItem _activeShipment = MockDataService.shipments.first;
-  bool _isTripActive = true;
 
   @override
   Widget build(BuildContext context) {

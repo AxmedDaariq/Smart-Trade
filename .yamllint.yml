@@ -1,0 +1,17 @@
+---
+extends: default
+
+ignore: |
+  .git/
+  node_modules/
+  artifacts/
+  **/templates/
+
+rules:
+  document-start: disable
+  truthy:
+    check-keys: false
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true

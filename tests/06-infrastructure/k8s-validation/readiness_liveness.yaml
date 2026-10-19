@@ -9,17 +9,17 @@ spec:
   template:
     spec:
       containers:
-      - name: customs-api
-        image: customs-api:latest
-        livenessProbe:
-          httpGet:
-            path: /health/liveness
-            port: 80
-          initialDelaySeconds: 3
-          periodSeconds: 3
-        readinessProbe:
-          httpGet:
-            path: /health/readiness
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: customs-api
+          image: customs-api:latest
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

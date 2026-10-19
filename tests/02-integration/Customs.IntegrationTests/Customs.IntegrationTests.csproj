@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Customs.IntegrationTests</AssemblyName>
+    <RootNamespace>Customs.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <ProjectReference Include="..\Shared\Shared.IntegrationTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\customs\Customs.Domain\Customs.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Application\Customs.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Infrastructure\Customs.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\customs\Customs.Api\Customs.Api.csproj" />
+  </ItemGroup>
+
+</Project>

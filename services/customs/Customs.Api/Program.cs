@@ -1,5 +1,7 @@
 using Customs.Application.Commands;
+using Customs.Infrastructure.Persistence;
 using BuildingBlocks.Web;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,16 @@ builder.Services.AddAuthorization(opts =>
     opts.AddPolicy("customs.risk.assess", p => p.RequireClaim("permissions", "customs.risk.assess"));
 });
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    builder.Services.AddDbContext<CustomsDbContext>(options => options.UseNpgsql(connectionString));
+    builder.Services.AddScoped<ICustomsDbContext>(sp => sp.GetRequiredService<CustomsDbContext>());
+}
+
+builder.Services.AddScoped<ICustomsCaseNumberGenerator, Customs.Infrastructure.Services.CustomsCaseNumberGenerator>();
+builder.Services.AddScoped<Customs.Domain.Repositories.ICustomsRepository, Customs.Infrastructure.Repositories.CustomsRepository>();
+
 var app = builder.Build();
 
 app.UsePlatformSecurity();
@@ -48,5 +60,20 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGet("/health/live", () => Results.Ok(new { status = "alive" })).AllowAnonymous();
+app.MapGet("/health/ready", async (IServiceProvider sp, CancellationToken ct) =>
+{
+    try
+    {
+        var db = sp.GetService<CustomsDbContext>();
+        if (db != null && await db.Database.CanConnectAsync(ct)) return (IResult)Results.Ok(new { status = "ready" });
+        return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+    catch
+    {
+        return Results.Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Database unavailable");
+    }
+}).AllowAnonymous();
 
 app.Run();
+
+public partial class Program { }
