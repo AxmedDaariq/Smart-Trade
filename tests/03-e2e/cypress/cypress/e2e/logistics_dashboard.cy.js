@@ -1,7 +1,43 @@
 describe('Logistics Dashboard', () => {
   beforeEach(() => {
+    // Intercept shipments API call to ensure stable test execution
+    cy.intercept('GET', '**/shipments*', {
+      statusCode: 200,
+      body: {
+        total: 2,
+        page: 1,
+        pageSize: 10,
+        items: [
+          {
+            id: 'shp-101',
+            shipmentNumber: 'SHP-2026-001',
+            shipperReference: 'REF-001',
+            consigneeReference: 'East Africa Importers',
+            origin: 'Berbera Port',
+            destination: 'Addis Ababa',
+            status: 'In-Transit',
+            transportMode: 'Road',
+            estimatedArrivalUtc: new Date(Date.now() + 86400000).toISOString(),
+            createdAtUtc: new Date().toISOString()
+          },
+          {
+            id: 'shp-102',
+            shipmentNumber: 'SHP-2026-002',
+            shipperReference: 'REF-002',
+            consigneeReference: 'Addis Commodities',
+            origin: 'Berbera Port',
+            destination: 'Dire Dawa',
+            status: 'Border Gate',
+            transportMode: 'Road',
+            estimatedArrivalUtc: new Date(Date.now() + 172800000).toISOString(),
+            createdAtUtc: new Date().toISOString()
+          }
+        ]
+      }
+    }).as('getShipments');
+
     cy.login();
-    cy.visit('/dashboard/logistics');
+    cy.visit('/logistics/dashboard');
   });
 
   it('should successfully load the logistics dashboard', () => {

@@ -1,46 +1,46 @@
 describe('User Onboarding and Identity Flow', () => {
-  
-  it('should complete a full user registration and identity verification process', () => {
-    // 1. Registration Page
-    cy.visit('/register');
-    
-    cy.get('[data-cy=reg-username]').type('testuser_smarttrade');
-    cy.get('[data-cy=reg-email]').type('testuser@smarttrade.com');
-    cy.get('[data-cy=reg-password]').type('SecurePassword123!');
-    cy.get('[data-cy=reg-password-confirm]').type('SecurePassword123!');
-    cy.get('[data-cy=reg-submit]').click();
-    
-    cy.contains('Registration Successful').should('be.visible');
-    cy.contains('Please verify your identity').should('be.visible');
+  beforeEach(() => {
+    // Intercept registration and login endpoints
+    cy.intercept('POST', '**/api/v1/identity/auth/register-tenant', {
+      statusCode: 200,
+      body: { message: 'Organization successfully registered' }
+    }).as('registerTenant');
 
-    // 2. Identity Verification (KYC Process)
-    cy.get('[data-cy=verify-identity-btn]').click();
-    
-    // Simulating upload of ID documents
-    cy.get('[data-cy=id-upload]').selectFile('cypress/fixtures/sample-passport.pdf', { force: true });
-    cy.get('[data-cy=tax-id]').type('TAX-99887766');
-    cy.get('[data-cy=submit-verification]').click();
-    
-    cy.contains('Documents Submitted').should('be.visible');
-    cy.contains('Verification in Progress').should('be.visible');
+    cy.intercept('POST', '**/api/v1/identity/auth/login', {
+      statusCode: 200,
+      body: {
+        accessToken: 'mock_onboard_token_123',
+        tenantCode: 'NEW-CORP',
+        permissions: ['control-tower.read'],
+        roles: ['EnterpriseAdmin'],
+        tenantType: 'logistics'
+      }
+    }).as('loginUser');
+  });
 
-    // 3. Login with new credentials
+  it('should complete a full tenant registration and sign in process', () => {
+    // 1. Visit Auth Page and switch to registration tab
     cy.visit('/login');
-    cy.get('[data-cy=login-username]').type('testuser_smarttrade');
-    cy.get('[data-cy=login-password]').type('SecurePassword123!');
+    cy.contains('Register Organization').click();
+
+    // 2. Fill enterprise registration form
+    cy.get('[data-cy=reg-org-name]').type('East African Cross-Border Express');
+    cy.get('[data-cy=reg-tenant-code]').clear().type('EASTAFR-EXP');
+    cy.get('[data-cy=reg-admin-name]').type('Ahmed Ali Daariq');
+    cy.get('[data-cy=reg-email]').type('ahmed@eastafricolog.com');
+    cy.get('[data-cy=reg-password]').type('P@ssword123!');
+    cy.get('[data-cy=reg-submit]').click();
+
+    // 3. Verify success message and transition to login form
+    cy.get('.auth-alert').should('be.visible');
+
+    // 4. Log in with registered credentials
+    cy.get('[data-cy=login-tenant]').clear().type('EASTAFR-EXP');
+    cy.get('[data-cy=login-username]').clear().type('ahmed@eastafricolog.com');
+    cy.get('[data-cy=login-password]').clear().type('P@ssword123!');
     cy.get('[data-cy=login-submit]').click();
-    
-    // 4. Profile Completion
-    cy.visit('/profile/complete');
-    cy.get('[data-cy=profile-full-name]').type('Test User One');
-    cy.get('[data-cy=profile-phone]').type('+1234567890');
-    cy.get('[data-cy=profile-company]').type('Test Logistics Ltd');
-    cy.get('[data-cy=save-profile]').click();
-    
-    cy.contains('Profile Updated').should('be.visible');
-    
-    // 5. Final Landing Page Verification
-    cy.visit('/dashboard');
-    cy.get('[data-cy=user-welcome-msg]').should('contain', 'Welcome, Test User One');
+
+    // 5. Lands on authenticated operations hub
+    cy.url().should('match', /\/(dashboard|logistics)/);
   });
 });

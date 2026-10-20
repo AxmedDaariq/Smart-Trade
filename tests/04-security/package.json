@@ -1,0 +1,25 @@
+{
+  "name": "smart-trade-security-tests",
+  "version": "1.0.0",
+  "description": "Enterprise Security Testing Suite for Smart Trade Logistics Platform – OWASP Top 10, OWASP ZAP DAST, API Fuzzing, Auth/RBAC & Tenant Isolation",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:security",
+    "test:security": "mocha 'api/**/*.test.js' 'authentication/**/*.test.js' 'authorization/**/*.test.js' 'tenant-isolation/**/*.test.js' --timeout 30000 --exit",
+    "test:owasp": "mocha 'api/**/*.test.js' --timeout 30000 --exit",
+    "test:auth": "mocha 'authentication/**/*.test.js' 'authorization/**/*.test.js' --timeout 30000 --exit",
+    "test:tenant": "mocha 'tenant-isolation/**/*.test.js' --timeout 30000 --exit",
+    "zap:baseline": "node dast/zap-ci-runner.js --mode=baseline",
+    "zap:api": "node dast/zap-ci-runner.js --mode=api",
+    "zap:full": "node dast/zap-ci-runner.js --mode=full",
+    "scan:dependencies": "node dependency-scanning/dependency-audit.js",
+    "audit:report": "node dast/generate-security-report.js"
+  },
+  "devDependencies": {
+    "axios": "^1.6.5",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.10",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1"
+  }
+}

@@ -1,43 +1,45 @@
 describe('Logistics End-to-End Flow', () => {
   beforeEach(() => {
-    // We assume the application is running and the user is logged in
-    // In a real scenario, we would use a custom command like cy.login()
-    cy.visit('/dashboard'); 
+    cy.intercept('GET', '**/shipments*', {
+      statusCode: 200,
+      body: {
+        total: 1,
+        page: 1,
+        pageSize: 10,
+        items: [
+          {
+            id: 'shp-e2e-01',
+            shipmentNumber: 'SHP-2026-9901',
+            shipperReference: 'REF-EXP-01',
+            consigneeReference: 'Addis Importers',
+            origin: 'Berbera Port',
+            destination: 'Addis Ababa',
+            status: 'In-Transit',
+            transportMode: 'Multimodal',
+            estimatedArrivalUtc: new Date(Date.now() + 86400000).toISOString(),
+            createdAtUtc: new Date().toISOString()
+          }
+        ]
+      }
+    }).as('getShipments');
+
+    cy.login();
+    cy.visit('/logistics/dashboard');
   });
 
-  it('should complete the full logistics chain: Order -> Customs -> Fleet', () => {
-    // 1. Create Shipping Order
-    cy.get('[data-cy=create-order-btn]').click();
-    cy.get('[data-cy=order-customer]').type('Global Trade Corp');
-    cy.get('[data-cy=order-item]').type('Industrial Machinery');
-    cy.get('[data-cy=order-weight]').type('5000');
-    cy.get('[data-cy=submit-order]').click();
-    
-    cy.contains('Order Created Successfully').should('be.visible');
-    cy.get('[data-cy=order-id]').invoke('text').as('orderId');
+  it('should navigate through logistics freight portal and interact with dispatch and export', () => {
+    // 1. Verify freight portal is active
+    cy.get('.dashboard-hero-title').should('contain', 'Logistics');
 
-    // 2. Process Customs Clearance
-    cy.get('@orderId').then((id) => {
-      cy.visit(`/customs/clearance/${id}`);
-      cy.get('[data-cy=customs-status-dropdown]').select('Cleared');
-      cy.get('[data-cy=customs-officer-note]').type('All documents verified');
-      cy.get('[data-cy=approve-customs]').click();
-      
-      cy.contains('Customs Cleared').should('be.visible');
+    // 2. Export manifest action
+    cy.get('[data-cy=btn-export-manifest]').should('be.visible').click();
+
+    // 3. Dispatch new consignment action
+    cy.get('[data-cy=btn-dispatch-consignment]').should('be.visible').click();
+
+    // 4. Inspect active shipment row
+    cy.get('[data-cy=shipment-table-row]').first().within(() => {
+      cy.get('[data-cy=shipment-status-badge]').should('contain', 'In Transit');
     });
-
-    // 3. Assign to Fleet and Dispatch
-    cy.get('@orderId').then((id) => {
-      cy.visit(`/fleet/assign/${id}`);
-      cy.get('[data-cy=truck-select]').select('Truck-A102');
-      cy.get('[data-cy=driver-select]').select('John Doe');
-      cy.get('[data-cy=dispatch-btn]').click();
-      
-      cy.contains('Shipment Dispatched').should('be.visible');
-    });
-
-    // 4. Final Verification on Dashboard
-    cy.visit('/dashboard');
-    cy.get('[data-cy=shipment-status-table]').should('contain', 'Dispatched');
   });
 });

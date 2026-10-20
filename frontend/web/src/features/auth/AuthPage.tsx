@@ -250,6 +250,7 @@ export const AuthPage: React.FC = () => {
                   <input
                     id="tenantCode"
                     name="tenantCode"
+                    data-cy="login-tenant"
                     value={tenantCode}
                     onChange={(e) => setTenantCode(e.target.value)}
                     autoComplete="organization"
@@ -266,6 +267,7 @@ export const AuthPage: React.FC = () => {
                   <input
                     id="email"
                     name="email"
+                    data-cy="login-username"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -283,6 +285,7 @@ export const AuthPage: React.FC = () => {
                   <input
                     id="password"
                     name="password"
+                    data-cy="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -293,7 +296,7 @@ export const AuthPage: React.FC = () => {
                 </div>
               </div>
 
-              <button type="submit" disabled={pending} className="submit-btn">
+              <button type="submit" disabled={pending} className="submit-btn" data-cy="login-submit">
                 {pending ? (
                   <>Signing in…</>
                 ) : (
@@ -312,6 +315,7 @@ export const AuthPage: React.FC = () => {
                   <Building2 size={18} className="input-icon" />
                   <input
                     id="regOrgName"
+                    data-cy="reg-org-name"
                     value={orgName}
                     onChange={(e) => setOrgName(e.target.value)}
                     placeholder="e.g. Red Sea Freight & Logistics Ltd"
@@ -326,6 +330,7 @@ export const AuthPage: React.FC = () => {
                   <Building2 size={18} className="input-icon" />
                   <input
                     id="regTenantCode"
+                    data-cy="reg-tenant-code"
                     value={tenantCode}
                     onChange={(e) => setTenantCode(e.target.value.toUpperCase())}
                     placeholder="e.g. REDSEA-LOG"
@@ -339,7 +344,8 @@ export const AuthPage: React.FC = () => {
                 <div className="input-wrapper">
                   <Anchor size={18} className="input-icon" />
                   <select 
-                    id="regOrgType" 
+                    id="regOrgType"
+                    data-cy="reg-org-type" 
                     value={orgType} 
                     onChange={(e) => setOrgType(e.target.value)}
                   >
@@ -357,6 +363,7 @@ export const AuthPage: React.FC = () => {
                   <ShieldCheck size={18} className="input-icon" />
                   <input
                     id="regAdminName"
+                    data-cy="reg-admin-name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Ahmed Ali Daariq"
@@ -371,6 +378,7 @@ export const AuthPage: React.FC = () => {
                   <Mail size={18} className="input-icon" />
                   <input
                     id="regEmail"
+                    data-cy="reg-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -386,6 +394,7 @@ export const AuthPage: React.FC = () => {
                   <Lock size={18} className="input-icon" />
                   <input
                     id="regPassword"
+                    data-cy="reg-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -395,7 +404,7 @@ export const AuthPage: React.FC = () => {
                 </div>
               </div>
 
-              <button type="submit" disabled={pending} className="submit-btn">
+              <button type="submit" disabled={pending} className="submit-btn" data-cy="reg-submit">
                 {pending ? 'Registering…' : (
                   <>
                     <UserPlus size={18} /> Register Enterprise Tenant

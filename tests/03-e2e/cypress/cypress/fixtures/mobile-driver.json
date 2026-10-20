@@ -1,0 +1,60 @@
+{
+  "activeMission": {
+    "waybillNumber": "WB-2026-HORN-0842",
+    "origin": "Berbera Port Container Terminal",
+    "nextWaypoint": "Tog-Wajaale Border Clearance Post",
+    "destination": "Mojo Multimodal Dryport Hub",
+    "consignee": "East African Commodity Traders Ltd",
+    "containerId": "MSCU-782194-2",
+    "cargoDescription": "Pharmaceutical Cold Chain Supplies",
+    "requiredTemp": -18.0,
+    "currentTemp": -18.2,
+    "eSealId": "ESEAL-BER-99410",
+    "eSealStatus": "LOCKED_SECURE",
+    "gpsCoordinates": {
+      "latitude": 9.5982,
+      "longitude": 44.0621,
+      "speedKmH": 68.5,
+      "speedLimitKmH": 80.0
+    }
+  },
+  "driverProfile": {
+    "driverId": "DRV-88210",
+    "fullName": "Mohamed Hassan Jama",
+    "licenseClass": "Heavy Rigid Class 4",
+    "vehicle": "Volvo FH16 Globetrotter (SL-884-TR)",
+    "tenantCode": "TENANT-GLB",
+    "eldCompliance": {
+      "drivingHoursRemaining": 5.4,
+      "totalShiftHours": 8.0,
+      "status": "COMPLIANT"
+    }
+  },
+  "epodSubmission": {
+    "waybillNumber": "WB-2026-HORN-0842",
+    "receiverName": "Dawit Tesfaye",
+    "receiverTitle": "Chief Receiving Yard Officer",
+    "checklist": {
+      "sealIntact": true,
+      "shellUndamaged": true,
+      "tempCompliant": true,
+      "customsCleared": true
+    },
+    "signatureToken": "e7b8c3d1f4a9b2c8e1d5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7",
+    "handoverTimestampUtc": "2026-10-20T14:30:00Z"
+  },
+  "offlineSyncEvents": [
+    {
+      "eventId": "EVT-SYNC-001",
+      "eventType": "CORRIDOR_WAYPOINT_PASSED",
+      "waypoint": "Hargeisa Transit Hub",
+      "timestamp": "2026-10-20T11:15:00Z"
+    },
+    {
+      "eventId": "EVT-SYNC-002",
+      "eventType": "ESEAL_STATUS_PING",
+      "sealStatus": "LOCKED_SECURE",
+      "timestamp": "2026-10-20T12:00:00Z"
+    }
+  ]
+}

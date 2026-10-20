@@ -1,13 +1,30 @@
 {
   "name": "smart-trade-logistics-e2e",
   "version": "1.0.0",
-  "description": "End-to-End tests for Smart Trade Logistics Platform",
-  "main": "index.js",
+  "description": "Full-stack End-to-End tests for Smart Trade Logistics Platform – Frontend, Backend, Database, Mobile",
+  "private": true,
   "scripts": {
-    "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:open":       "cypress open",
+    "cy:run":        "cypress run",
+    "cy:run:web":    "cypress run --spec 'cypress/e2e/frontend/**/*.cy.js,cypress/e2e/backend/**/*.cy.js'",
+    "cy:run:api":    "cypress run --spec 'cypress/e2e/backend/**/*.cy.js'",
+    "cy:run:db":           "cypress run --spec 'cypress/e2e/database/**/*.cy.js'",
+    "cy:run:mongo":        "cypress run --spec 'cypress/e2e/database/mongodb-telematics.cy.js'",
+    "cy:run:redis-rabbit": "cypress run --spec 'cypress/e2e/database/redis-rabbitmq-verification.cy.js'",
+    "cy:run:mobile":       "cypress run --spec 'cypress/e2e/mobile/**/*.cy.js'",
+    "cy:run:full":         "cypress run --spec 'cypress/e2e/full-stack/**/*.cy.js'",
+    "cy:report":           "npx mochawesome-merge cypress/reports/*.json -o cypress/reports/report.json && npx marge cypress/reports/report.json -f report -o cypress/reports",
+    "cy:ci":               "cypress run --browser chrome --headless",
+    "pretest":             "echo 'Ensure docker-compose services (PostgreSQL, MongoDB, Redis, RabbitMQ) are running'"
   },
   "devDependencies": {
-    "cypress": "^13.6.0"
+    "cypress": "^13.6.0",
+    "cypress-mochawesome-reporter": "^3.8.0",
+    "cypress-real-events": "^1.13.0",
+    "pg": "^8.11.3",
+    "mongodb": "^6.3.0",
+    "ioredis": "^5.3.2",
+    "amqplib": "^0.10.3",
+    "axios": "^1.6.0"
   }
 }

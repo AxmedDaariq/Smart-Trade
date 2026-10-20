@@ -58,6 +58,7 @@ export const AppLayout: React.FC = () => {
 
           <NavLink 
             to="/logistics/dashboard" 
+            data-cy="nav-logistics"
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <LayoutDashboard size={18} />
@@ -67,6 +68,7 @@ export const AppLayout: React.FC = () => {
 
           <NavLink 
             to="/government/dashboard" 
+            data-cy="nav-customs"
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <ShieldAlert size={18} />
@@ -76,6 +78,7 @@ export const AppLayout: React.FC = () => {
 
           <NavLink 
             to="/control-tower" 
+            data-cy="nav-control-tower"
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <Radio size={18} />
@@ -85,6 +88,7 @@ export const AppLayout: React.FC = () => {
 
           <NavLink 
             to="/dryport/dashboard" 
+            data-cy="nav-dryport"
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <Layers size={18} />
@@ -92,7 +96,7 @@ export const AppLayout: React.FC = () => {
           </NavLink>
 
           <div className="nav-section-title" style={{ marginTop: '1rem' }}>Fleet & Transit</div>
-          <div className="nav-item" style={{ cursor: 'pointer', opacity: 0.85 }}>
+          <div className="nav-item" data-cy="nav-fleet" style={{ cursor: 'pointer', opacity: 0.85 }}>
             <Truck size={18} />
             <span>GPS Fleet Telemetry</span>
             <span className="nav-badge" style={{ backgroundColor: 'rgba(168, 85, 247, 0.2)', color: '#c084fc' }}>18 Active</span>
@@ -104,13 +108,14 @@ export const AppLayout: React.FC = () => {
           <div className="user-profile">
             <div className="user-avatar">{getInitials()}</div>
             <div className="user-info">
-              <span className="user-name">{session?.tenantCode ? `User (${session.tenantCode})` : 'Enterprise User'}</span>
-              <span className="user-role">{session?.roles[0] || 'Logistics Admin'}</span>
+              <span className="user-name" data-cy="user-name">{session?.tenantCode ? `User (${session.tenantCode})` : 'Enterprise User'}</span>
+              <span className="user-role" data-cy="user-role">{session?.roles[0] || 'Logistics Admin'}</span>
             </div>
           </div>
           <button 
             type="button" 
             className="logout-btn" 
+            data-cy="logout-btn"
             title="Sign out" 
             onClick={handleSignOut}
             aria-label="Sign out"
