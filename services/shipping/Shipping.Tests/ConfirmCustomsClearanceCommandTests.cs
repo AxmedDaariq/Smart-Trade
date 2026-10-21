@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shipping.Application.Commands;
+using Shipping.Domain.Entities;
 using Shipping.Domain.Enums;
 using Shipping.Infrastructure.Persistence;
 
@@ -17,30 +18,29 @@ public class ConfirmCustomsClearanceCommandTests
         var tenantId = Guid.NewGuid();
         var userId = Guid.NewGuid();
 
-        var createHandler = new CreateShipmentCommandHandler(ctx, new ShipmentNumberGenerator());
-        var shipmentId = await createHandler.Handle(new CreateShipmentCommand
-        {
-            TenantId = tenantId,
-            ShipperName = "Test Shipper",
-            ShipperReference = "REF-001",
-            ConsigneeName = "Test Consignee",
-            ConsigneeReference = "CON-001",
-            OriginCountryCode = "SO",
-            OriginPortCode = "SOBER",
-            OriginPortName = "Berbera",
-            DestinationCountryCode = "AE",
-            DestinationPortCode = "AEJEA",
-            DestinationPortName = "Jebel Ali",
-            TransportMode = TransportMode.Sea,
-            CargoType = CargoType.FCL,
-            Incoterm = Incoterm.CIF,
-            Currency = "USD",
-            GrossWeightKg = 10000,
-            PackageCount = 200,
-            UserId = userId
-        }, CancellationToken.None);
+        var shipment = new Shipment(
+            tenantId: tenantId,
+            shipmentNumber: "TEST-SHIP-001",
+            shipperName: "Test Shipper",
+            shipperReference: "REF-001",
+            consigneeName: "Test Consignee",
+            consigneeReference: "CON-001",
+            originCountryCode: "SO",
+            originPortCode: "SOBER",
+            originPortName: "Berbera",
+            destinationCountryCode: "AE",
+            destinationPortCode: "AEJEA",
+            destinationPortName: "Jebel Ali",
+            transportMode: TransportMode.Sea,
+            cargoType: CargoType.FCL,
+            incoterm: Incoterm.CIF,
+            currency: "USD",
+            createdBy: userId);
 
-        return (ctx, shipmentId, tenantId, userId);
+        ctx.Shipments.Add(shipment);
+        await ctx.SaveChangesAsync();
+
+        return (ctx, shipment.Id, tenantId, userId);
     }
 
     [Fact]

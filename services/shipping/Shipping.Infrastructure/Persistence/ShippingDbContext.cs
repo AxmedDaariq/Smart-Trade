@@ -78,7 +78,7 @@ public class ShippingDbContext : SmartDbContext<ShippingDbContext>,
             e.Property(s => s.FreightValue).HasColumnType("numeric(19,4)");
             e.Property(s => s.InsuranceValue).HasColumnType("numeric(19,4)");
             e.Property(s => s.DeclaredValue).HasColumnType("numeric(19,4)");
-            e.Property(s => s.Version).IsRowVersion();
+            e.Property(s => s.Version);
 
             e.Property(s => s.TransportMode).HasConversion<string>();
             e.Property(s => s.CargoType).HasConversion<string>();
