@@ -8,12 +8,12 @@ namespace Shipping.Tests;
 
 public class UpdateShipmentStatusCommandTests
 {
-    private static async Task<(ShippingDbContext ctx, Guid shipmentId)> SeedShipmentAsync()
+    private static async Task<(DbContextOptions<ShippingDbContext> options, Guid shipmentId)> SeedShipmentAsync()
     {
         var options = new DbContextOptionsBuilder<ShippingDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        var ctx = new ShippingDbContext(options);
+        using var ctx = new ShippingDbContext(options);
 
         var shipment = new Shipment(
             tenantId: Guid.Parse("aaaaaaaa-0000-0000-0000-000000000001"),
@@ -37,13 +37,14 @@ public class UpdateShipmentStatusCommandTests
         ctx.Shipments.Add(shipment);
         await ctx.SaveChangesAsync();
 
-        return (ctx, shipment.Id);
+        return (options, shipment.Id);
     }
 
     [Fact]
     public async Task Handle_ValidTransition_UpdatesStatusAndRecordsHistory()
     {
-        var (ctx, shipmentId) = await SeedShipmentAsync();
+        var (options, shipmentId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new UpdateShipmentStatusCommandHandler(ctx);
 
         await handler.Handle(new UpdateShipmentStatusCommand
@@ -68,7 +69,8 @@ public class UpdateShipmentStatusCommandTests
     [Fact]
     public async Task Handle_TransitionFromDelivered_ThrowsInvalidOperation()
     {
-        var (ctx, shipmentId) = await SeedShipmentAsync();
+        var (options, shipmentId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new UpdateShipmentStatusCommandHandler(ctx);
 
         // First move to Delivered

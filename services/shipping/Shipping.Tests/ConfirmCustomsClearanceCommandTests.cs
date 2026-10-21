@@ -8,12 +8,12 @@ namespace Shipping.Tests;
 
 public class ConfirmCustomsClearanceCommandTests
 {
-    private static async Task<(ShippingDbContext ctx, Guid shipmentId, Guid tenantId, Guid userId)> SeedShipmentAsync()
+    private static async Task<(DbContextOptions<ShippingDbContext> options, Guid shipmentId, Guid tenantId, Guid userId)> SeedShipmentAsync()
     {
         var options = new DbContextOptionsBuilder<ShippingDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        var ctx = new ShippingDbContext(options);
+        using var ctx = new ShippingDbContext(options);
 
         var tenantId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -40,13 +40,14 @@ public class ConfirmCustomsClearanceCommandTests
         ctx.Shipments.Add(shipment);
         await ctx.SaveChangesAsync();
 
-        return (ctx, shipment.Id, tenantId, userId);
+        return (options, shipment.Id, tenantId, userId);
     }
 
     [Fact]
     public async Task Handle_ValidCommand_ClearsCustomsAndTransitionsStatus()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new ConfirmCustomsClearanceCommandHandler(ctx);
         var customsCaseId = Guid.NewGuid();
 
@@ -81,7 +82,8 @@ public class ConfirmCustomsClearanceCommandTests
     [Fact]
     public async Task Handle_AlreadyCleared_ThrowsInvalidOperation()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new ConfirmCustomsClearanceCommandHandler(ctx);
 
         await handler.Handle(new ConfirmCustomsClearanceCommand
@@ -107,7 +109,8 @@ public class ConfirmCustomsClearanceCommandTests
     [Fact]
     public async Task Handle_UnknownShipment_ThrowsInvalidOperation()
     {
-        var (ctx, _, tenantId, userId) = await SeedShipmentAsync();
+        var (options, _, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new ConfirmCustomsClearanceCommandHandler(ctx);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -124,7 +127,8 @@ public class ConfirmCustomsClearanceCommandTests
     [Fact]
     public async Task Handle_WrongTenant_ThrowsInvalidOperation()
     {
-        var (ctx, shipmentId, _, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, _, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new ConfirmCustomsClearanceCommandHandler(ctx);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>

@@ -8,12 +8,12 @@ namespace Shipping.Tests;
 
 public class RecordTrackingEventCommandTests
 {
-    private static async Task<(ShippingDbContext ctx, Guid shipmentId, Guid tenantId, Guid userId)> SeedShipmentAsync()
+    private static async Task<(DbContextOptions<ShippingDbContext> options, Guid shipmentId, Guid tenantId, Guid userId)> SeedShipmentAsync()
     {
         var options = new DbContextOptionsBuilder<ShippingDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        var ctx = new ShippingDbContext(options);
+        using var ctx = new ShippingDbContext(options);
 
         var tenantId = Guid.NewGuid();
         var userId = Guid.NewGuid();
@@ -40,13 +40,14 @@ public class RecordTrackingEventCommandTests
         ctx.Shipments.Add(shipment);
         await ctx.SaveChangesAsync();
 
-        return (ctx, shipment.Id, tenantId, userId);
+        return (options, shipment.Id, tenantId, userId);
     }
 
     [Fact]
     public async Task Handle_ValidEvent_AddsTrackingEventAndReturnsId()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         var eventId = await handler.Handle(new RecordTrackingEventCommand
@@ -76,7 +77,8 @@ public class RecordTrackingEventCommandTests
     [Fact]
     public async Task Handle_PickupEvent_AutoTransitionsStatusToPickedUp()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         await handler.Handle(new RecordTrackingEventCommand
@@ -103,7 +105,8 @@ public class RecordTrackingEventCommandTests
     [Fact]
     public async Task Handle_DeliveredEvent_AutoTransitionsStatusToDelivered()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         await handler.Handle(new RecordTrackingEventCommand
@@ -124,7 +127,8 @@ public class RecordTrackingEventCommandTests
     [Fact]
     public async Task Handle_EventWithoutAutoTransition_KeepsCurrentStatus()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         await handler.Handle(new RecordTrackingEventCommand
@@ -145,7 +149,8 @@ public class RecordTrackingEventCommandTests
     [Fact]
     public async Task Handle_EnrichesEventWithGpsAndCarrierMetadata()
     {
-        var (ctx, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         await handler.Handle(new RecordTrackingEventCommand
@@ -172,7 +177,8 @@ public class RecordTrackingEventCommandTests
     [Fact]
     public async Task Handle_UnknownShipment_ThrowsInvalidOperation()
     {
-        var (ctx, _, tenantId, userId) = await SeedShipmentAsync();
+        var (options, _, tenantId, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -189,7 +195,8 @@ public class RecordTrackingEventCommandTests
     [Fact]
     public async Task Handle_WrongTenant_ThrowsInvalidOperation()
     {
-        var (ctx, shipmentId, _, userId) = await SeedShipmentAsync();
+        var (options, shipmentId, _, userId) = await SeedShipmentAsync();
+        using var ctx = new ShippingDbContext(options);
         var handler = new RecordTrackingEventCommandHandler(ctx);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
