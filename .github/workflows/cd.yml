@@ -39,7 +39,7 @@ jobs:
     name: "🔍 Detect Changed Services"
     runs-on: ubuntu-latest
     outputs:
-      services: ${{ steps.filter.outputs.services }}
+      services: ${{ steps.filter.outputs.changes }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4.4.0
@@ -71,28 +71,47 @@ jobs:
 
       - name: Build service matrix
         id: set-matrix
+        env:
+          FILTER_CHANGES: ${{ steps.filter.outputs.changes }}
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_SERVICE: ${{ inputs.service }}
+          GIT_REF: ${{ github.ref }}
         run: |
-          SERVICES=()
           ALL_SERVICES=(
             identity customs shipping payment notification fleet gps
             gps-telematics audit declaration analytics corridor dryport
             ectn anpr-gate ais-vessel integration
           )
-          for svc in "${ALL_SERVICES[@]}"; do
-            if [ "${{ steps.filter.outputs[svc] }}" == "true" ] || \
-               [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+
+          TARGET_SERVICES=()
+
+          if [[ "$GIT_REF" == refs/tags/* ]]; then
+            TARGET_SERVICES=("${ALL_SERVICES[@]}")
+          elif [ "$EVENT_NAME" == "workflow_dispatch" ]; then
+            if [ -n "$DISPATCH_SERVICE" ]; then
+              TARGET_SERVICES=("$DISPATCH_SERVICE")
+            else
+              TARGET_SERVICES=("${ALL_SERVICES[@]}")
+            fi
+          else
+            if [ -n "$FILTER_CHANGES" ] && [ "$FILTER_CHANGES" != "[]" ]; then
+              mapfile -t TARGET_SERVICES < <(echo "$FILTER_CHANGES" | jq -r '.[]')
+            fi
+          fi
+
+          SERVICES=()
+          for svc in "${TARGET_SERVICES[@]}"; do
+            if [ -n "$svc" ]; then
               SERVICES+=("{\"service\":\"${svc}\"}")
             fi
           done
-          # Force rebuild all on tag push
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            SERVICES=()
-            for svc in "${ALL_SERVICES[@]}"; do
-              SERVICES+=("{\"service\":\"${svc}\"}")
-            done
+
+          if [ ${#SERVICES[@]} -eq 0 ]; then
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+          else
+            MATRIX=$(echo "[$(IFS=','; echo "${SERVICES[*]}")]")
+            echo "matrix={\"include\":${MATRIX}}" >> "$GITHUB_OUTPUT"
           fi
-          MATRIX=$(echo "[$(IFS=','; echo "${SERVICES[*]}")]")
-          echo "matrix={\"include\":${MATRIX}}" >> $GITHUB_OUTPUT
 
   # ─────────────────────────────────────────────────────────────────────────────
   # JOB 2: Build, Sign & Push Docker images
