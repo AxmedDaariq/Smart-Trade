@@ -5,7 +5,7 @@ namespace Shipping.Domain.Entities;
 /// </summary>
 public class ShipmentDocument
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
     public Guid ShipmentId { get; set; }
     public Shipment? Shipment { get; set; }
 
