@@ -9,7 +9,7 @@ namespace Integration.Tests.Application.Commands;
 
 public class ProcessWebhookCommandHandlerTests
 {
-    private const string PartnerSecret = "test-webhook-secret-do-not-use-in-prod";
+    private const string PartnerSecret = "test-secret-value-for-unit-testing-only";
     private const string UnknownPartner = "UNKNOWN-PARTNER";
 
     private readonly HmacExternalRequestSigner _signer = new();
