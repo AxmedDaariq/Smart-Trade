@@ -1,3 +1,17 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// SECRETS POLICY — DO NOT HARDCODE SECRETS IN THIS FILE OR ANY SOURCE FILE.
+//
+//  Runtime secrets (Jwt:Secret, ConnectionStrings:DefaultConnection, …) must
+//  come from one of the following sources, in priority order:
+//    1. HashiCorp Vault (prod / staging)   → injected as env vars by the
+//       Vault Agent sidecar / k8s CSI driver (see infrastructure/vault/)
+//    2. GitHub Actions secrets              → set in repo Settings → Secrets
+//    3. .env file (local dev only)          → listed in .env.example, NEVER
+//       committed (.env is in .gitignore)
+//
+//  For integration tests, appsettings.Test.json reads Jwt:Secret from the
+//  environment variable JWT_SECRET_TEST — see infrastructure/vault/README.md.
+// ─────────────────────────────────────────────────────────────────────────────
 using Identity.Application.Interfaces;
 using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Security;

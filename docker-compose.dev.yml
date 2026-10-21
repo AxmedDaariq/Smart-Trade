@@ -1,0 +1,216 @@
+# docker-compose.dev.yml
+# ─────────────────────────────────────────────────────────────────────────────
+# LOCAL DEVELOPMENT STACK — SmartTrade Logistics Platform
+#
+# SECRETS POLICY
+#   All secrets are sourced from a .env file that is NEVER committed to git.
+#   Copy .env.example to .env and fill in real values before running:
+#
+#       cp .env.example .env
+#       docker compose -f docker-compose.dev.yml up -d
+#
+#   In production / staging, HashiCorp Vault injects secrets at runtime via
+#   the Vault Agent sidecar.  See infrastructure/vault/ for full config.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "3.8"
+
+# ---------------------------------------------------------------------------
+# SHARED NETWORKS
+# ---------------------------------------------------------------------------
+networks:
+  smart-trade-net:
+    driver: bridge
+    name: smart-trade-dev
+
+# ---------------------------------------------------------------------------
+# NAMED VOLUMES
+# ---------------------------------------------------------------------------
+volumes:
+  postgres_data:
+  postgis_data:
+  mongodb_data:
+  redis_data:
+  rabbitmq_data:
+  vault_data:
+  vault_logs:
+
+# ---------------------------------------------------------------------------
+# SERVICES
+# ---------------------------------------------------------------------------
+services:
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # SECRETS MANAGER — HashiCorp Vault (dev mode)
+  # ──────────────────────────────────────────────────────────────────────────
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: smart-vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      # Dev mode: auto-unseals with a fixed root token — local dev ONLY.
+      # Never run with VAULT_DEV_ROOT_TOKEN_ID in production.
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN:-dev-only-root-token-change-me}
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+      VAULT_LOG_LEVEL: info
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault_data:/vault/data
+      - vault_logs:/vault/logs
+      - ./infrastructure/vault/policies:/vault/policies:ro
+    networks:
+      - smart-trade-net
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Vault initialiser: writes all dev secrets on first boot, then exits.
+  vault-init:
+    image: hashicorp/vault:1.17
+    container_name: smart-vault-init
+    restart: "no"
+    depends_on:
+      vault:
+        condition: service_healthy
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${VAULT_DEV_ROOT_TOKEN:-dev-only-root-token-change-me}
+      # ── JWT ──────────────────────────────────────────────────────────────
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER:-smart-trade}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-smart-trade-clients}
+      JWT_LIFETIME_MINUTES: ${JWT_LIFETIME_MINUTES:-15}
+      # ── Databases ────────────────────────────────────────────────────────
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGIS_PASSWORD: ${POSTGIS_PASSWORD}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # ── Messaging ────────────────────────────────────────────────────────
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      # ── External APIs ────────────────────────────────────────────────────
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
+      AIS_API_KEY: ${AIS_API_KEY}
+      ANPR_API_KEY: ${ANPR_API_KEY}
+      # ── Observability ────────────────────────────────────────────────────
+      GRAFANA_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      JAEGER_AUTH_TOKEN: ${JAEGER_AUTH_TOKEN:-}
+    volumes:
+      - ./infrastructure/vault/init-secrets.sh:/init-secrets.sh:ro
+    entrypoint: ["/bin/sh", "/init-secrets.sh"]
+    networks:
+      - smart-trade-net
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # DATABASES
+  # ──────────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required — copy .env.example to .env}
+      POSTGRES_DB: ${POSTGRES_DB:-smart_platform}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/databases/init/postgres:/docker-entrypoint-initdb.d:ro
+    networks:
+      - smart-trade-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-smart_platform}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgis:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: smart-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGIS_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGIS_PASSWORD:?POSTGIS_PASSWORD is required — copy .env.example to .env}
+      POSTGRES_DB: ${POSTGIS_DB:-smart_gis}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/databases/init/postgis:/docker-entrypoint-initdb.d:ro
+    networks:
+      - smart-trade-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGIS_USER:-postgres} -d ${POSTGIS_DB:-smart_gis}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7.0
+    container_name: smart-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?MONGO_PASSWORD is required — copy .env.example to .env}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./infrastructure/docker/databases/init/mongo:/docker-entrypoint-initdb.d:ro
+    networks:
+      - smart-trade-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: smart-redis
+    restart: unless-stopped
+    # Password is passed as a command argument — never hardcoded.
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required — copy .env.example to .env}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - smart-trade-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: smart-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-smart_trade}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required — copy .env.example to .env}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-/smart_trade}
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - smart-trade-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5

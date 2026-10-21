@@ -108,18 +108,29 @@ jobs:
 
       - name: Build ${{ matrix.service }}
         run: |
-          find services/${{ matrix.service }} -name '*.csproj' -not -path '*/obj/*' -not -name '*.Tests*' | \
+          # Build all projects in the service — including test projects.
+          # Excluding *.Tests* caused test DLLs to be missing at test time,
+          # which produced "The argument .dll is invalid" from vstest.
+          find services/${{ matrix.service }} -name '*.csproj' -not -path '*/obj/*' | \
           xargs -I {} dotnet build {} --no-restore --configuration Release
 
       - name: Test ${{ matrix.service }}
+        env:
+          # ASP.NET Core env var convention: __ maps to : (section separator)
+          # These override the empty values in appsettings.Test.json at runtime.
+          Jwt__Secret: ${{ secrets.JWT_SECRET_TEST }}
+          ConnectionStrings__DefaultConnection: >-
+            Host=localhost;Port=5432;Database=smart_identity_test;
+            Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }}
         run: |
           find services/${{ matrix.service }} -name '*.Tests.csproj' -not -path '*/obj/*' | \
           xargs -I {} dotnet test {} \
-            --no-build \
+            --no-restore \
             --configuration Release \
             --logger "trx;LogFileName=test-results-${{ matrix.service }}.trx" \
             --collect:"XPlat Code Coverage" \
             --results-directory ./test-results/${{ matrix.service }}
+
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -156,7 +167,7 @@ jobs:
       - uses: actions/checkout@v4.4.0
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           queries: security-and-quality
@@ -172,7 +183,7 @@ jobs:
           xargs -I {} dotnet build {} --configuration Release
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
           upload: true
@@ -234,7 +245,11 @@ jobs:
           ignore-unfixed: true
 
       - name: Upload Trivy results to Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
+        # continue-on-error: Code Scanning must be enabled in the repo settings.
+        # If it is not enabled, this step warns but does not block the build.
+        # Enable it at: Settings → Code security → Code scanning → Set up.
+        continue-on-error: true
         if: always()
         with:
           sarif_file: trivy-results.sarif
@@ -264,11 +279,22 @@ jobs:
           output_file_path: checkov-results.sarif
           soft_fail: true
 
-      - name: Upload Checkov results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always() && hashFiles('checkov-results.sarif') != ''
+      - name: Upload Checkov results as artifact
+        uses: actions/upload-artifact@v4
+        if: always() && hashFiles('checkov-results.sarif/**') != ''
         with:
-          sarif_file: checkov-results.sarif
+          name: checkov-results-sarif
+          path: checkov-results.sarif/
+          retention-days: 30
+
+      - name: Upload Checkov results to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        # continue-on-error: requires Code Scanning to be enabled in repo settings.
+        # Enable it at: Settings → Code security → Code scanning → Set up.
+        continue-on-error: true
+        if: always() && hashFiles('checkov-results.sarif/**') != ''
+        with:
+          sarif_file: checkov-results.sarif/results_sarif.sarif
           category: checkov
 
   # ─────────────────────────────────────────────────────────────────────────────

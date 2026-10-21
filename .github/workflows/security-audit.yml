@@ -60,7 +60,8 @@ jobs:
           exit-code: "0"  # Weekly audit — don't fail, report instead
 
       - name: Upload scan results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true  # Requires Code Scanning enabled in repo settings
         if: always()
         with:
           sarif_file: trivy-${{ matrix.service }}.sarif
@@ -125,7 +126,8 @@ jobs:
           working_directory: infrastructure/terraform
 
       - name: Upload tfsec results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
+        continue-on-error: true  # Requires Code Scanning enabled in repo settings
         if: always()
         with:
           sarif_file: tfsec.sarif
