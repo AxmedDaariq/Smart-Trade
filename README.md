@@ -64,11 +64,14 @@ Our **GitHub Actions** pipeline automates the entire path to production:
 
 ### Running the Suite
 ```bash
-# Run all unit tests
-dotnet test tests/01-unit
+# Run all unit tests (bash / Linux)
+for proj in tests/01-unit/*/*.csproj; do dotnet test "$proj"; done
+
+# Run all unit tests (PowerShell / Windows)
+Get-ChildItem tests/01-unit -Filter *.csproj -Recurse | ForEach-Object { dotnet test $_.FullName }
 
 # Run integration tests (Requires Docker)
-dotnet test tests/02-integration
+for proj in tests/02-integration/*/*.csproj; do [[ "$proj" =~ Shared ]] && continue; dotnet test "$proj"; done
 
 # Run E2E tests
 cd tests/03-e2e/cypress && npm install && npm run cy:run

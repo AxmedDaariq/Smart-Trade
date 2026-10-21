@@ -49,10 +49,21 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Run Unit Tests
-        run: dotnet test tests/01-unit
+        run: |
+          for proj in tests/01-unit/*/*.csproj; do
+            echo "::group::Testing $proj"
+            dotnet test "$proj" --configuration Release
+            echo "::endgroup::"
+          done
 
       - name: Run Integration Tests (Testcontainers)
-        run: dotnet test tests/02-integration
+        run: |
+          for proj in tests/02-integration/*/*.csproj; do
+            if [[ "$proj" == *"Shared.IntegrationTests.csproj" ]]; then continue; fi
+            echo "::group::Testing $proj"
+            dotnet test "$proj" --configuration Release
+            echo "::endgroup::"
+          done
 
       - name: Run E2E Tests (Cypress)
         run: |

@@ -9,6 +9,7 @@ COPY services/identity/Identity.Application/Identity.Application.csproj services
 COPY services/identity/Identity.Domain/Identity.Domain.csproj services/identity/Identity.Domain/
 COPY services/identity/Identity.Infrastructure/Identity.Infrastructure.csproj services/identity/Identity.Infrastructure/
 COPY building-blocks/persistence/BuildingBlocks.Persistence.csproj building-blocks/persistence/
+COPY building-blocks/web/BuildingBlocks.Web.csproj building-blocks/web/
 RUN dotnet restore services/identity/Identity.Api/Identity.Api.csproj
 
 COPY . .

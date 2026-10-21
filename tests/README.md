@@ -22,7 +22,17 @@ tests/
 dotnet test tests/01-unit/Identity.UnitTests/Identity.UnitTests.csproj
 ```
 
-### All Tests
+### All Solution Tests
 ```bash
-dotnet test tests/
+dotnet test smart-trade.sln
+```
+
+### All Unit Tests (bash / Linux)
+```bash
+for proj in tests/01-unit/*/*.csproj; do dotnet test "$proj"; done
+```
+
+### All Unit Tests (PowerShell / Windows)
+```powershell
+Get-ChildItem tests/01-unit -Filter *.csproj -Recurse | ForEach-Object { dotnet test $_.FullName }
 ```
