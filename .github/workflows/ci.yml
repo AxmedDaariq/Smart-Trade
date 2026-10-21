@@ -234,7 +234,15 @@ jobs:
           cache-to: type=gha,mode=max
           load: true
 
-      - name: Trivy vulnerability scan
+      - name: Trivy vulnerability scan (console report)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: smart-trade/identity:scan
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Trivy vulnerability scan (SARIF report)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: smart-trade/identity:scan
