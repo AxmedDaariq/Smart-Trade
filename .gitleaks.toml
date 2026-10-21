@@ -17,6 +17,9 @@ commits = [
     # A dev/test JWT fallback was introduced then removed in the next commit.
     # The current HEAD contains no hardcoded secret.
     "d261f261be8df8fd55f8eef3587d6014f19b26a7",
+    # services/integration/Integration.Tests/Application/Commands/ProcessWebhookCommandHandlerTests.cs:12
+    # Mock partner secret used strictly in unit tests ("test-secret-value-for-unit-testing-only")
+    "202cb8a53229494add972572f07540b320b5e862",
 ]
 
 paths = [
@@ -27,6 +30,8 @@ paths = [
     '''(?i)\.env\..*''',
     # Top-level integration / e2e / perf / security test trees
     '''(?i)^tests/.*''',
+    # Service unit and integration test trees
+    '''(?i)^services/.*/.*Tests/.*''',
     # Mobile unit and widget test directories
     '''(?i)^mobile/.*/test/.*''',
     # EF Core migration snapshot files

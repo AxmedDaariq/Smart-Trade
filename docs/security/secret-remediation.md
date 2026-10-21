@@ -58,6 +58,26 @@ The substring `ids` followed by other characters matched the `generic-api-key` r
 
 ---
 
+### Finding 3 — Unit test mock partner secret in `ProcessWebhookCommandHandlerTests.cs`
+
+| Field | Value |
+|---|---|
+| **Rule** | `generic-api-key` |
+| **File** | `services/integration/Integration.Tests/Application/Commands/ProcessWebhookCommandHandlerTests.cs` |
+| **Line** | 12 |
+| **Commit** | `202cb8a53229494add972572f07540b320b5e862` |
+| **Severity** | LOW (false positive — test fixture) |
+| **Status** | ✅ Suppressed |
+
+**Root cause:** A test fixture constant `PartnerSecret = "test-secret-value-for-unit-testing-only"` used for verifying HMAC webhook signature calculations in unit tests was flagged by `generic-api-key`.
+
+**Actions taken:**
+1. Added commit `202cb8a53229494add972572f07540b320b5e862` to `.gitleaks.toml` `allowlist.commits`.
+2. Added `services/.*/.*Tests/.*` to `.gitleaks.toml` `allowlist.paths` to cover all service-level unit/integration test suites.
+3. Created `.gitleaksignore` with fingerprint `202cb8a53229494add972572f07540b320b5e862:services/integration/Integration.Tests/Application/Commands/ProcessWebhookCommandHandlerTests.cs:generic-api-key:12`.
+
+---
+
 ## Prevention Measures
 
 | Measure | Status |

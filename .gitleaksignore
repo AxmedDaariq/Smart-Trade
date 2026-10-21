@@ -1,0 +1,3 @@
+# Gitleaks ignore file
+# Format: fingerprint or secret hash
+202cb8a53229494add972572f07540b320b5e862:services/integration/Integration.Tests/Application/Commands/ProcessWebhookCommandHandlerTests.cs:generic-api-key:12
