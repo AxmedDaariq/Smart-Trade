@@ -14,48 +14,48 @@ spec:
         spec:
           serviceAccountName: backup-operator
           containers:
-          - name: postgres-backup
-            image: postgres:15-alpine
-            command:
-            - /bin/sh
-            - -c
-            - /scripts/backup_postgres.sh
-            env:
-            # Vault injector would typically populate these from annotations
-            - name: PGHOST
-              value: "smart-postgres-primary.smart-db.svc.cluster.local"
-            - name: PGUSER
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-backup-credentials
-                  key: username
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-backup-credentials
-                  key: password
-            - name: S3_BUCKET
-              value: "smart-trade-backups-bucket"
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: s3-backup-credentials
-                  key: access_key
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: s3-backup-credentials
-                  key: secret_key
-            volumeMounts:
-            - name: backup-scripts
-              mountPath: /scripts
-            - name: backup-storage
-              mountPath: /backups
+            - name: postgres-backup
+              image: postgres:15-alpine
+              command:
+                - /bin/sh
+                - -c
+                - /scripts/backup_postgres.sh
+              env:
+                # Vault injector would typically populate these from annotations
+                - name: PGHOST
+                  value: "smart-postgres-primary.smart-db.svc.cluster.local"
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-backup-credentials
+                      key: username
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-backup-credentials
+                      key: password
+                - name: S3_BUCKET
+                  value: "smart-trade-backups-bucket"
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: s3-backup-credentials
+                      key: access_key
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: s3-backup-credentials
+                      key: secret_key
+              volumeMounts:
+                - name: backup-scripts
+                  mountPath: /scripts
+                - name: backup-storage
+                  mountPath: /backups
           volumes:
-          - name: backup-scripts
-            configMap:
-              name: postgres-backup-scripts
-              defaultMode: 0777
-          - name: backup-storage
-            emptyDir: {}
+            - name: backup-scripts
+              configMap:
+                name: postgres-backup-scripts
+                defaultMode: 0777
+            - name: backup-storage
+              emptyDir: {}
           restartPolicy: OnFailure

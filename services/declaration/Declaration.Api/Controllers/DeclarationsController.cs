@@ -9,6 +9,8 @@ namespace Declaration.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/declarations")]
+// A01: deny-by-default at controller level; individual actions add their permission policies.
+[Authorize]
 public class DeclarationsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -23,15 +25,9 @@ public class DeclarationsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateDeclarationCommand command)
     {
         // Enforce tenant isolation
-        var tenantIdClaim = User.FindFirst("TenantId")?.Value;
-        if (tenantIdClaim != null && Guid.TryParse(tenantIdClaim, out var tenantId))
-        {
-            command.TenantId = tenantId;
-        }
-        else
-        {
-            return Forbid("DECLARATION_TENANT_ACCESS_DENIED");
-        }
+        if (!TryGetActor(out var tenantId, out var userId)) return Forbid();
+        command.TenantId = tenantId;
+        command.CreatedBy = userId;
 
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(Get), new { id = result }, result);
@@ -41,23 +37,16 @@ public class DeclarationsController : ControllerBase
     [Authorize(Policy = "declaration.read")]
     public async Task<IActionResult> Get(Guid id)
     {
-        return Ok(new { Id = id });
+        return Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Declaration lookup is not implemented.");
     }
 
     [HttpPost("{id}/submit")]
     [Authorize(Policy = "declaration.submit")]
     public async Task<IActionResult> Submit(Guid id, [FromBody] SubmitDeclarationCommand command)
     {
-        var tenantIdClaim = User.FindFirst("TenantId")?.Value;
-        if (tenantIdClaim != null && Guid.TryParse(tenantIdClaim, out var tenantId))
-        {
-            command.TenantId = tenantId;
-            command.DeclarationId = id;
-        }
-        else
-        {
-            return Forbid("DECLARATION_TENANT_ACCESS_DENIED");
-        }
+        if (!TryGetActor(out var tenantId, out _)) return Forbid();
+        command.TenantId = tenantId;
+        command.DeclarationId = id;
 
         var result = await _mediator.Send(command);
         return Ok(result);
@@ -67,14 +56,17 @@ public class DeclarationsController : ControllerBase
     [Authorize(Policy = "declaration.review")]
     public async Task<IActionResult> StartReview(Guid id)
     {
-        return Ok();
+        return Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Declaration review is not implemented.");
     }
     
     [HttpPost("{id}/accept")]
     [Authorize(Policy = "declaration.accept")]
     public async Task<IActionResult> Accept(Guid id, [FromBody] AcceptDeclarationCommand command)
     {
+        if (!TryGetActor(out var tenantId, out var userId)) return Forbid();
+        command.TenantId = tenantId;
         command.DeclarationId = id;
+        command.UserId = userId;
         var result = await _mediator.Send(command);
         return Ok(result);
     }
@@ -83,8 +75,18 @@ public class DeclarationsController : ControllerBase
     [Authorize(Policy = "declaration.reject")]
     public async Task<IActionResult> Reject(Guid id, [FromBody] RejectDeclarationCommand command)
     {
+        if (!TryGetActor(out var tenantId, out var userId)) return Forbid();
+        command.TenantId = tenantId;
         command.DeclarationId = id;
+        command.UserId = userId;
         var result = await _mediator.Send(command);
         return Ok(result);
+    }
+
+    private bool TryGetActor(out Guid tenantId, out Guid userId)
+    {
+        var hasTenant = Guid.TryParse(User.FindFirst("tenant_id")?.Value, out tenantId);
+        var hasUser = Guid.TryParse(User.FindFirst("sub")?.Value, out userId);
+        return hasTenant && hasUser;
     }
 }

@@ -9,10 +9,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Integration.Application\Integration.Application.csproj" />
     <ProjectReference Include="..\Integration.Infrastructure\Integration.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\web\BuildingBlocks.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
   </ItemGroup>
 

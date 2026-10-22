@@ -2,13 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using Customs.Domain.Entities;
 using Customs.Domain.Entities.Configuration;
 using Customs.Domain.Entities.Integration;
+using Customs.Application.Commands;
 using BuildingBlocks.Persistence; // Assuming SmartDbContext is located here
+
+using TariffSchedule = Customs.Domain.Entities.Configuration.TariffSchedule;
+using TariffItem = Customs.Domain.Entities.Configuration.TariffItem;
 
 namespace Customs.Infrastructure.Persistence;
 
-public class CustomsDbContext : SmartDbContext
+public class CustomsDbContext : SmartDbContext<CustomsDbContext>, ICustomsDbContext
 {
     public CustomsDbContext(DbContextOptions<CustomsDbContext> options) : base(options) { }
+
+    public void AddCustomsCase(CustomsCase customsCase) => CustomsCases.Add(customsCase);
 
     // Core Case & Assessment
     public DbSet<CustomsCase> CustomsCases => Set<CustomsCase>();

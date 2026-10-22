@@ -1,0 +1,188 @@
+/* Enterprise Control Tower Styling */
+.control-tower-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.tower-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1.5rem;
+}
+
+.tower-hero-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tower-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Telemetry Map Simulation Panel */
+.telemetry-map-panel {
+  background: radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 16px;
+  padding: 1.75rem;
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.map-radar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 420px;
+  height: 420px;
+  border: 1px dashed rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.map-radar-ring::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 260px;
+  height: 260px;
+  border: 1px dashed rgba(59, 130, 246, 0.25);
+  border-radius: 50%;
+}
+
+.map-telemetry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+
+.map-waypoints-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  z-index: 2;
+  margin-top: 1.5rem;
+}
+
+.waypoint-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.waypoint-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.waypoint-stat {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #38bdf8;
+  margin-top: 0.25rem;
+}
+
+/* Incidents & Alerts Stream */
+.alerts-stream-panel {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.alerts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.alert-item {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.alert-item:hover {
+  background: rgba(30, 41, 59, 0.65);
+}
+
+.alert-item.critical {
+  border-left: 3px solid #ef4444;
+}
+
+.alert-item.warning {
+  border-left: 3px solid #f59e0b;
+}
+
+.alert-item.info {
+  border-left: 3px solid #3b82f6;
+}
+
+.alert-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.alert-time {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.alert-desc {
+  font-size: 0.78125rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+@media (max-width: 1024px) {
+  .tower-grid {
+    grid-template-columns: 1fr;
+  }
+}

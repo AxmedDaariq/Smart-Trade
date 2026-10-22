@@ -8,7 +8,6 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingress.className }}
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
     - host: {{ .Values.ingress.host | quote }}

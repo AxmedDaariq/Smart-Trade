@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Identity.IntegrationTests</AssemblyName>
+    <RootNamespace>Identity.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <ProjectReference Include="..\Shared\Shared.IntegrationTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\identity\Identity.Api\Identity.Api.csproj" />
+  </ItemGroup>
+</Project>

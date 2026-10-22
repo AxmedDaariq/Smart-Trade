@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Fleet.UnitTests</AssemblyName>
+    <RootNamespace>Fleet.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\fleet\Fleet.Domain\Fleet.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\fleet\Fleet.Contracts\Fleet.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\fleet\Fleet.Application\Fleet.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\fleet\Fleet.Infrastructure\Fleet.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\fleet\Fleet.Api\Fleet.Api.csproj" />
+  </ItemGroup>
+
+</Project>

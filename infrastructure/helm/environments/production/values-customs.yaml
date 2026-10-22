@@ -8,8 +8,14 @@ replicaCount: 3
 ingress:
   enabled: true
   host: "api.smart-trade.com"
-  path: "/customs"
+  path: "/api/v1/CustomsCases"
 
 env:
   ASPNETCORE_ENVIRONMENT: "Production"
-  ConnectionStrings__DefaultConnection: "Server=tcp:prod-db.smart-trade.com;Database=CustomsDB;User Id=dbuser;Password=dbpass;"
+
+secretEnv:
+  - name: ConnectionStrings__DefaultConnection
+    valueFrom:
+      secretKeyRef:
+        name: customs-api-secrets
+        key: default-connection

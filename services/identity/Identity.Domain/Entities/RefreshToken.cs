@@ -21,6 +21,8 @@ public class RefreshToken
     public string CreatedFromUserAgent { get; set; } = string.Empty;
     
     public string Status { get; set; } = "Active"; // Active, Used, Revoked, Expired, ReuseDetected
+
+    public byte[] Version { get; set; } = Array.Empty<byte>();
     
     public Session Session { get; set; } = null!;
 }

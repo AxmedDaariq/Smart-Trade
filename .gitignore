@@ -1,169 +1,48 @@
-# ==============================================================================
-# Environment & Secrets (Never commit secrets / sensitive credentials)
-# ==============================================================================
-.env
-.env.*
-!.env.example
-!.env.template
-*.local
-*.secret
-*.pem
-*.key
-*.cert
-*.crt
-*.pfx
-*.p12
+# === IDE and Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 
-# ==============================================================================
-# Repomix / AI & Codebase Aggregation Outputs
-# ==============================================================================
-repomix-output.txt
-repomix-output.xml
-repomix-output.json
-repomix-output.md
-codebase-context.txt
-
-# ==============================================================================
-# Node.js / JavaScript / TypeScript / Frontend / Mobile
-# ==============================================================================
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-.pnpm-store/
-
-# Build artifacts & caches
-dist/
-build/
-out/
-.next/
-.nuxt/
-.vuepress/dist
-.cache/
-.parcel-cache/
-.turbo/
-.vercel/
-.output/
-
-# Mobile (React Native / Expo / Flutter / Android / iOS)
-.expo/
-.expo-shared/
-*.jks
-*.keystore
-*.apk
-*.aab
-*.ipa
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-
-# ==============================================================================
-# .NET / C# / Visual Studio
-# ==============================================================================
+# === .NET / C# ===
 bin/
 obj/
-[Bb]in/
-[Oo]bj/
-*.suo
 *.user
+*.suo
 *.userosscache
 *.sln.docstates
-*.userprefs
-.vs/
-.vscode/.suo
-TestResults/
-[Tt]est[Rr]esult*/
-*.trx
-*.coverage
-*.coveragexml
-_ReSharper*/
-*.dotCover
 
-# NuGet Packages & local package folders
-*.nupkg
-*.snupkg
-**/packages/*
-!**/packages/build/
-project.lock.json
-project.fragment.lock.json
-artifacts/packages/
-
-# ==============================================================================
-# IDEs & Developer Tools
-# ==============================================================================
-# VS Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# JetBrains (Rider, WebStorm, IntelliJ, etc.)
-.idea/
-*.iws
-*.iml
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-[Tt]humbs.db
-[Dd]esktop.ini
-
-# ==============================================================================
-# Testing, Coverage & Quality Tools
-# ==============================================================================
-coverage/
-.nyc_output/
-*.lcov
-.sonar/
-.scannerwork/
-cypress/videos/
+# === Node.js / Cypress ===
+node_modules/
 cypress/screenshots/
-playwright-report/
-test-results/
+cypress/videos/
+.npm/
+npm-debug.log*
+yarn-error.log*
 
-# ==============================================================================
-# Database, Local Volumes & State
-# ==============================================================================
-*.sqlite
-*.sqlite3
-*.db
-*.db-shm
-*.db-wal
-mongo-data/
-postgres-data/
-mysql-data/
-redis-data/
-data/
-*.dump
-*.sql.gz
-
-# ==============================================================================
-# Logs & Temporary Files
-# ==============================================================================
-logs/
-*.log
-tmp/
-temp/
-*.tmp
-*.bak
-*.swp
-*~
-
-# ==============================================================================
-# Terraform & DevSecOps
-# ==============================================================================
+# === Infrastructure & Tools ===
+.env
+.env.test
+*.local
+*.secrets
 .terraform/
 *.tfstate
 *.tfstate.backup
-.terraform.lock.hcl
-.trivycache/
-checkov_report.json
-*.tfvars
+
+# === Database & Backups ===
+*.sql
+*.bak
+*.dump
+tests/04-performance/jmeter/results/
+tests/05-security/owasp-zap/reports/
+scripts/db-maintenance/backups/
+
+# === OS / System ===
+C:\Users\Tariq\.claude/
+.claude/
+
+# === Bundles & Large Dumps ===
+repomix*
+*-output.txt

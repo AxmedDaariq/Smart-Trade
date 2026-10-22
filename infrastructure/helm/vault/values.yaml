@@ -21,7 +21,7 @@ server:
           path = "/vault/data"
         }
         disable_mlock = true
-  
+
   # Kordhinta qiyaasta memory-ga ee Node kasta
   resources:
     requests:

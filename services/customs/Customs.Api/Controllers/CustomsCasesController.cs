@@ -23,12 +23,9 @@ public class CustomsCasesController : ControllerBase
     [Authorize(Policy = "customs.case.create")]
     public async Task<IActionResult> CreateCase([FromBody] ReceiveDeclarationCommand command)
     {
-        // TenantId would normally be resolved via middleware/claims, setting it explicitly for example
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
-        
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId)) return Forbid();
+        command.TenantId = tenantId;
+
         // UserId from claims
         if (User.HasClaim(c => c.Type == "sub"))
         {
@@ -43,15 +40,13 @@ public class CustomsCasesController : ControllerBase
     [Authorize(Policy = "customs.case.read")]
     public async Task<IActionResult> GetCase(Guid id)
     {
-        // Implementation for GetCaseQuery would go here
-        return Ok(new { Id = id, Status = "Pending" });
+        return Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Case lookup is not implemented.");
     }
 
     [HttpPost("{id}/risk-assessment")]
     [Authorize(Policy = "customs.risk.assess")]
     public async Task<IActionResult> StartRiskAssessment(Guid id)
     {
-        // Implementation to invoke RiskRuleEngine and update state
-        return Accepted();
+        return Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Risk assessment is not implemented.");
     }
 }

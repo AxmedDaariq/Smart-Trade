@@ -1,20 +1,36 @@
+{{/*
+ServiceMonitor — tells Prometheus to scrape this service's /metrics endpoint
+*/}}
 {{- if .Values.metrics.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "smart-trade-service.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ include "smart-trade-service.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    # Astaantan (label) waxay u sheegaysaa Prometheus inuu raadiyo ServiceMonitor-kan
-    release: prometheus 
+    {{- include "smart-trade-service.labels" . | nindent 4 }}
+    # This label is required for the Prometheus Operator to discover this monitor
+    release: kube-prometheus-stack
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "smart-trade-service.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "smart-trade-service.selectorLabels" . | nindent 6 }}
   endpoints:
-    - port: http
+    - port: metrics
       path: {{ .Values.metrics.path | default "/metrics" }}
-      interval: 15s
+      interval: 30s
+      scrapeTimeout: 10s
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_service_name]
+          targetLabel: service
+        - targetLabel: environment
+          replacement: {{ .Release.Namespace }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
 {{- end }}

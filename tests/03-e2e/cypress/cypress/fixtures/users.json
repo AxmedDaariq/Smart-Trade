@@ -1,0 +1,34 @@
+{
+  "admin": {
+    "email": "admin@acme.com",
+    "password": "Admin@123456!",
+    "fullName": "System Administrator",
+    "role": "admin"
+  },
+  "operator": {
+    "email": "operator@acme.com",
+    "password": "Operator@123!",
+    "fullName": "Operations Manager",
+    "role": "operator"
+  },
+  "customs_officer": {
+    "email": "customs@acme.com",
+    "password": "Customs@123!",
+    "fullName": "Customs Officer",
+    "role": "customs_officer"
+  },
+  "driver": {
+    "email": "driver_test@smarttrade.com",
+    "password": "DriverPass123!",
+    "fullName": "Test Driver",
+    "role": "driver"
+  },
+  "new_user": {
+    "username": "e2e_testuser",
+    "email": "e2e_testuser@smarttrade.com",
+    "password": "E2ETest@SecurePass1!",
+    "fullName": "E2E Test User",
+    "phone": "+252612345678",
+    "company": "E2E Logistics Ltd"
+  }
+}

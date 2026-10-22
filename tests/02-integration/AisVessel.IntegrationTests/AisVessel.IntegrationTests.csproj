@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AisVessel.IntegrationTests</AssemblyName>
+    <RootNamespace>AisVessel.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <ProjectReference Include="..\Shared\Shared.IntegrationTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\ais-vessel\AisVessel.Domain\AisVessel.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\ais-vessel\AisVessel.Contracts\AisVessel.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\ais-vessel\AisVessel.Application\AisVessel.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\ais-vessel\AisVessel.Infrastructure\AisVessel.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\ais-vessel\AisVessel.Api\AisVessel.Api.csproj" />
+  </ItemGroup>
+
+</Project>

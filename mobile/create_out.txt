@@ -1,0 +1,97 @@
+Recreating project driver...
+  driver\.gitignore (created)
+  driver\.idea\libraries\Dart_SDK.xml (created)
+  driver\.idea\libraries\KotlinJavaRuntime.xml (created)
+  driver\.idea\modules.xml (created)
+  driver\.idea\runConfigurations\main_dart.xml (created)
+  driver\.idea\workspace.xml (created)
+  driver\analysis_options.yaml (created)
+  driver\android\app\build.gradle.kts (created)
+  driver\android\app\src\main\kotlin\com\smarttrade\smart_trade_driver\MainActivity.kt (created)
+  driver\android\build.gradle.kts (created)
+  driver\android\smart_trade_driver_android.iml (created)
+  driver\android\.gitignore (created)
+  driver\android\app\src\debug\AndroidManifest.xml (created)
+  driver\android\app\src\main\AndroidManifest.xml (created)
+  driver\android\app\src\main\res\drawable\launch_background.xml (created)
+  driver\android\app\src\main\res\drawable-v21\launch_background.xml (created)
+  driver\android\app\src\main\res\mipmap-hdpi\ic_launcher.png (created)
+  driver\android\app\src\main\res\mipmap-mdpi\ic_launcher.png (created)
+  driver\android\app\src\main\res\mipmap-xhdpi\ic_launcher.png (created)
+  driver\android\app\src\main\res\mipmap-xxhdpi\ic_launcher.png (created)
+  driver\android\app\src\main\res\mipmap-xxxhdpi\ic_launcher.png (created)
+  driver\android\app\src\main\res\values\styles.xml (created)
+  driver\android\app\src\main\res\values-night\styles.xml (created)
+  driver\android\app\src\profile\AndroidManifest.xml (created)
+  driver\android\gradle\wrapper\gradle-wrapper.properties (created)
+  driver\android\gradle.properties (created)
+  driver\android\settings.gradle.kts (created)
+  driver\ios\.gitignore (created)
+  driver\ios\Flutter\AppFrameworkInfo.plist (created)
+  driver\ios\Flutter\Debug.xcconfig (created)
+  driver\ios\Flutter\Release.xcconfig (created)
+  driver\ios\Runner\AppDelegate.swift (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-1024x1024@1x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-20x20@1x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-20x20@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-20x20@3x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-29x29@1x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-29x29@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-29x29@3x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-40x40@1x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-40x40@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-40x40@3x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-60x60@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-60x60@3x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-76x76@1x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-76x76@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\AppIcon.appiconset\Icon-App-83.5x83.5@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\LaunchImage.imageset\Contents.json (created)
+  driver\ios\Runner\Assets.xcassets\LaunchImage.imageset\LaunchImage.png (created)
+  driver\ios\Runner\Assets.xcassets\LaunchImage.imageset\LaunchImage@2x.png (created)
+  driver\ios\Runner\Assets.xcassets\LaunchImage.imageset\LaunchImage@3x.png (created)
+  driver\ios\Runner\Assets.xcassets\LaunchImage.imageset\README.md (created)
+  driver\ios\Runner\Base.lproj\LaunchScreen.storyboard (created)
+  driver\ios\Runner\Base.lproj\Main.storyboard (created)
+  driver\ios\Runner\Info.plist (created)
+  driver\ios\Runner\Runner-Bridging-Header.h (created)
+  driver\ios\Runner\SceneDelegate.swift (created)
+  driver\ios\Runner.xcodeproj\project.pbxproj (created)
+  driver\ios\Runner.xcodeproj\project.xcworkspace\contents.xcworkspacedata (created)
+  driver\ios\Runner.xcodeproj\project.xcworkspace\xcshareddata\IDEWorkspaceChecks.plist (created)
+  driver\ios\Runner.xcodeproj\project.xcworkspace\xcshareddata\WorkspaceSettings.xcsettings (created)
+  driver\ios\Runner.xcodeproj\xcshareddata\xcschemes\Runner.xcscheme (created)
+  driver\ios\Runner.xcworkspace\contents.xcworkspacedata (created)
+  driver\ios\Runner.xcworkspace\xcshareddata\IDEWorkspaceChecks.plist (created)
+  driver\ios\Runner.xcworkspace\xcshareddata\WorkspaceSettings.xcsettings (created)
+  driver\ios\RunnerTests\RunnerTests.swift (created)
+  driver\lib\main.dart (created)
+  driver\smart_trade_driver.iml (created)
+  driver\pubspec.yaml (created)
+  driver\README.md (created)
+  driver\web\favicon.png (created)
+  driver\web\icons\Icon-192.png (created)
+  driver\web\icons\Icon-512.png (created)
+  driver\web\icons\Icon-maskable-192.png (created)
+  driver\web\icons\Icon-maskable-512.png (created)
+  driver\web\index.html (created)
+  driver\web\manifest.json (created)
+  driver\test\widget_test.dart (created)
+Resolving dependencies in `driver`...
+Downloading packages...
+Got dependencies in `driver`.
+Wrote 82 files.
+
+All done!
+You can find general documentation for Flutter at: https://docs.flutter.dev/
+Detailed API documentation is available at: https://api.flutter.dev/
+If you prefer video documentation, consider: https://www.youtube.com/c/flutterdev
+
+In order to run your application, type:
+
+  $ cd driver
+  $ flutter run
+
+Your application code is in driver\lib\main.dart.
+

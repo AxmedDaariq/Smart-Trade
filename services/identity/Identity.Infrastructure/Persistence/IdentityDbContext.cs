@@ -4,7 +4,7 @@ using BuildingBlocks.Persistence; // Ensure SmartDbContext is accessible
 
 namespace Identity.Infrastructure.Persistence;
 
-public class IdentityDbContext : SmartDbContext
+public class IdentityDbContext : SmartDbContext<IdentityDbContext>
 {
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
     {
@@ -109,7 +109,7 @@ public class IdentityDbContext : SmartDbContext
         // RefreshToken
         builder.Entity<RefreshToken>(e => 
         {
-            e.HasIndex(rt => rt.TokenHash);
+            e.HasIndex(rt => rt.TokenHash).IsUnique();
             e.HasIndex(rt => rt.TokenFamilyId);
             e.HasIndex(rt => rt.UserId);
             e.HasIndex(rt => rt.SessionId);
@@ -117,6 +117,7 @@ public class IdentityDbContext : SmartDbContext
             
             e.HasOne(rt => rt.Session).WithMany(s => s.RefreshTokens).HasForeignKey(rt => rt.SessionId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne<User>().WithMany().HasForeignKey(rt => rt.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.Property(rt => rt.Version).IsRowVersion();
         });
 
         // MfaConfiguration

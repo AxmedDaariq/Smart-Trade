@@ -1,0 +1,40 @@
+{
+  "apiEndpoints": {
+    "identity": {
+      "login":          "POST /api/identity/login",
+      "register":       "POST /api/identity/register",
+      "refreshToken":   "POST /api/identity/refresh",
+      "profile":        "GET  /api/identity/profile"
+    },
+    "shipping": {
+      "listOrders":     "GET  /api/shipping/orders",
+      "createOrder":    "POST /api/shipping/orders",
+      "getOrder":       "GET  /api/shipping/orders/:id",
+      "updateStatus":   "PATCH /api/shipping/orders/:id/status"
+    },
+    "customs": {
+      "listDeclarations": "GET  /api/customs/declarations",
+      "createDeclaration": "POST /api/customs/declarations",
+      "approve":           "POST /api/customs/declarations/:id/approve"
+    },
+    "ectn": {
+      "apply":     "POST /api/ectn/applications",
+      "validate":  "POST /api/ectn/applications/:id/validate",
+      "issue":     "POST /api/ectn/applications/:id/issue"
+    },
+    "fleet": {
+      "assign":    "POST /api/fleet/assign",
+      "dispatch":  "POST /api/fleet/dispatch",
+      "tracking":  "GET  /api/fleet/tracking/:id"
+    },
+    "payment": {
+      "createInvoice": "POST /api/payment/invoices",
+      "payInvoice":    "POST /api/payment/invoices/:id/pay",
+      "getInvoice":    "GET  /api/payment/invoices/:id"
+    },
+    "notification": {
+      "list":    "GET  /api/notifications",
+      "markRead": "PATCH /api/notifications/:id/read"
+    }
+  }
+}

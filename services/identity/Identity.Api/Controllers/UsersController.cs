@@ -5,21 +5,14 @@ namespace Identity.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/identity/[controller]")]
-// [Authorize]
+[Authorize]
 public class UsersController : ControllerBase
 {
     [HttpGet]
-    // [RequirePermission("users.read")]
-    public async Task<IActionResult> GetUsers()
-    {
-        // Must filter by ITenantContext automatically via EF Global Query Filters
-        return Ok(new { Message = "Tenant isolated users retrieved" });
-    }
+    [Authorize(Policy = "identity.users.read")]
+    public IActionResult GetUsers() => Problem(statusCode: StatusCodes.Status501NotImplemented, title: "User listing is not implemented.");
 
     [HttpPost("{id}/suspend")]
-    // [RequirePermission("users.update")]
-    public async Task<IActionResult> SuspendUser(Guid id)
-    {
-        return Ok(new { Message = $"User {id} suspended" });
-    }
+    [Authorize(Policy = "identity.users.manage")]
+    public IActionResult SuspendUser(Guid id) => Problem(statusCode: StatusCodes.Status501NotImplemented, title: "User management is not implemented.");
 }

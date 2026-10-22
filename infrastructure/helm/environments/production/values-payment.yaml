@@ -1,0 +1,41 @@
+replicaCount: 2
+
+image:
+  repository: "AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/smart-trade/payment"
+  tag: "latest"
+
+containerPort: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "api.smart-trade.io"
+  path: "/api/payment"
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 65
+
+env:
+  ASPNETCORE_ENVIRONMENT: "Production"
+
+vault:
+  enabled: true
+  role: "payment-service"
+  secretPath: "secret/data/production/payment"
+  template: |
+    {{- with secret "secret/data/production/payment" -}}
+    export ConnectionStrings__DefaultConnection="{{ .Data.data.db_connection_string }}"
+    export Stripe__SecretKey="{{ .Data.data.stripe_secret }}"
+    export PaymentGateway__ApiKey="{{ .Data.data.payment_api_key }}"
+    {{- end -}}

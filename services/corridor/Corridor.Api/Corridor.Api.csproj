@@ -9,10 +9,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Corridor.Application\Corridor.Application.csproj" />
     <ProjectReference Include="..\Corridor.Infrastructure\Corridor.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\web\BuildingBlocks.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
   </ItemGroup>

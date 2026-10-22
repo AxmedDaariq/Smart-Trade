@@ -1,0 +1,36 @@
+{
+  "newShipment": {
+    "customer": "Global Trade Corp",
+    "item": "Industrial Machinery",
+    "weight": 5000,
+    "portOfLoading": "Shanghai",
+    "portOfDischarge": "Berbera",
+    "containerType": "40ft",
+    "containerCount": 2,
+    "estimatedArrival": "2026-11-15"
+  },
+  "ectnApplication": {
+    "vesselName": "MV Ocean Star",
+    "voyageNo": "V-2026-10",
+    "portOfLoading": "Shanghai",
+    "portOfDischarge": "Abidjan",
+    "cargoDescription": "Electronic Components",
+    "hsCode": "8517.12.00",
+    "weight": 12000,
+    "packages": 48
+  },
+  "corridorShipment": {
+    "origin": "Berbera Port",
+    "destination": "Addis Ababa",
+    "corridorNodes": ["Berbera", "Wajaale", "Togwajaale", "Jigjiga", "Harar", "Dire Dawa", "Addis Ababa"],
+    "truckPlate": "SL-2026-A102",
+    "driverName": "Test Driver"
+  },
+  "dryportContainer": {
+    "containerId": "MSKU-1234567-0",
+    "size": "40ft",
+    "status": "Arrived",
+    "demurrageDays": 0,
+    "consignee": "East Africa Importers"
+  }
+}

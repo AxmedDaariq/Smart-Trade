@@ -4,7 +4,7 @@ using BuildingBlocks.Persistence; // Ensure SmartDbContext is accessible
 
 namespace Declaration.Infrastructure.Persistence;
 
-public class DeclarationDbContext : SmartDbContext
+public class DeclarationDbContext : SmartDbContext<DeclarationDbContext>
 {
     public DeclarationDbContext(DbContextOptions<DeclarationDbContext> options) : base(options) { }
 

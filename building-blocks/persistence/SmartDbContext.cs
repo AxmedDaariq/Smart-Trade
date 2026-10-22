@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace BuildingBlocks.Persistence;
 
-public abstract class SmartDbContext : DbContext
+public abstract class SmartDbContext<TContext> : DbContext
+    where TContext : DbContext
 {
-    protected SmartDbContext(DbContextOptions options) : base(options)
+    protected SmartDbContext(DbContextOptions<TContext> options) : base(options)
     {
     }
 

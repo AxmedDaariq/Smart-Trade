@@ -15,7 +15,7 @@ spec:
     helm:
       # Wuxuu isticmaalayaa values-ka u gaarka ah Customs API
       valueFiles:
-      - ../environments/production/values-customs.yaml
+        - ../environments/production/values-customs.yaml
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: production

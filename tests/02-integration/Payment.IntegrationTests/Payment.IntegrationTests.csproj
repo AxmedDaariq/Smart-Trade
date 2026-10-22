@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Payment.IntegrationTests</AssemblyName>
+    <RootNamespace>Payment.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+    <ProjectReference Include="..\Shared\Shared.IntegrationTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\payment\Payment.Domain\Payment.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\payment\Payment.Contracts\Payment.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\payment\Payment.Application\Payment.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\payment\Payment.Infrastructure\Payment.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\payment\Payment.Api\Payment.Api.csproj" />
+  </ItemGroup>
+
+</Project>

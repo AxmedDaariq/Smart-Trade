@@ -23,10 +23,8 @@ public class BerthAllocationsController : ControllerBase
     [Authorize(Policy = "ais.berth.allocate")]
     public async Task<IActionResult> AllocateBerth([FromBody] AllocateBerthCommand command)
     {
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId)) return Forbid();
+        command.TenantId = tenantId;
 
         var portCallId = await _mediator.Send(command);
         return Ok(new { PortCallId = portCallId, Status = "BerthAllocated" });

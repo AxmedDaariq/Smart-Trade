@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
+using Analytics.Application.Interfaces;
 using Analytics.Domain.Entities;
-using Analytics.Infrastructure.Persistence;
+using MassTransit;
 
 namespace Analytics.Application.Consumers;
 
@@ -24,9 +23,9 @@ public class TripMilestoneEvent
 
 public class TripMilestoneConsumer : IConsumer<TripMilestoneEvent>
 {
-    private readonly AnalyticsDbContext _context;
+    private readonly IAnalyticsDbContext _context;
 
-    public TripMilestoneConsumer(AnalyticsDbContext context)
+    public TripMilestoneConsumer(IAnalyticsDbContext context)
     {
         _context = context;
     }
@@ -34,9 +33,10 @@ public class TripMilestoneConsumer : IConsumer<TripMilestoneEvent>
     public async Task Consume(ConsumeContext<TripMilestoneEvent> context)
     {
         var msg = context.Message;
-        
+        var cancellationToken = context.CancellationToken;
+
         // Idempotency Check: Don't ingest the same event twice
-        var exists = await _context.FactTripMilestones.AnyAsync(f => f.SourceEventId == msg.EventId);
+        var exists = await _context.FactTripMilestoneExistsAsync(msg.EventId, cancellationToken);
         if (exists) return;
 
         // Data Quality Rule: Log and skip negative durations
@@ -60,7 +60,7 @@ public class TripMilestoneConsumer : IConsumer<TripMilestoneEvent>
             msg.EventId
         );
 
-        _context.FactTripMilestones.Add(fact);
-        await _context.SaveChangesAsync();
+        _context.AddFactTripMilestone(fact);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

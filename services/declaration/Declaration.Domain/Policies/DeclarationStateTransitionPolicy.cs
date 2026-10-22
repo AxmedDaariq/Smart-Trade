@@ -6,9 +6,9 @@ namespace Declaration.Domain.Policies;
 
 public class DeclarationStateTransitionPolicy : IDeclarationStateTransitionPolicy
 {
-    public bool CanTransition(CustomsDeclaration declaration, DeclarationStatus targetStatus)
+    public bool CanTransition(DeclarationStatus currentStatus, DeclarationStatus targetStatus)
     {
-        return (declaration.Status, targetStatus) switch
+        return (currentStatus, targetStatus) switch
         {
             (DeclarationStatus.Draft, DeclarationStatus.Submitted) => true,
             (DeclarationStatus.Draft, DeclarationStatus.Cancelled) => true,
@@ -32,9 +32,14 @@ public class DeclarationStateTransitionPolicy : IDeclarationStateTransitionPolic
 
     public void EnforceTransitionRules(CustomsDeclaration declaration, DeclarationStatus targetStatus)
     {
-        if (!CanTransition(declaration, targetStatus))
+        if (!Enum.TryParse<DeclarationStatus>(declaration.Status, true, out var currentStatus))
         {
-            throw new InvalidOperationException($"Invalid state transition from {declaration.Status} to {targetStatus}");
+            throw new InvalidOperationException($"Invalid or unrecognized current status: '{declaration.Status}'");
+        }
+
+        if (!CanTransition(currentStatus, targetStatus))
+        {
+            throw new InvalidOperationException($"Invalid state transition from {currentStatus} to {targetStatus}");
         }
     }
 }

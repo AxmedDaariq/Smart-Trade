@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using AnprGate.Domain.Entities;
-using AnprGate.Infrastructure.Persistence;
+// using AnprGate.Infrastructure.Persistence;
 
 namespace AnprGate.Application.Commands;
 
@@ -21,33 +21,14 @@ public class IngestRecognitionCommand : IRequest<Guid>
 
 public class IngestRecognitionCommandHandler : IRequestHandler<IngestRecognitionCommand, Guid>
 {
-    private readonly AnprDbContext _context;
+    // private readonly AnprDbContext _context;
 
-    public IngestRecognitionCommandHandler(AnprDbContext context)
+    public IngestRecognitionCommandHandler()
     {
-        _context = context;
     }
 
     public async Task<Guid> Handle(IngestRecognitionCommand request, CancellationToken cancellationToken)
     {
-        // IPlateNormalizationService logic would go here.
-        var normalizedPlate = request.PlateText.ToUpper().Replace(" ", "").Replace("-", "");
-
-        var recognitionEvent = new RecognitionEvent(
-            request.TenantId,
-            request.CameraId,
-            request.PlateText,
-            normalizedPlate,
-            request.Confidence,
-            request.ObservedAt,
-            request.ProviderEventId);
-            
-        _context.RecognitionEvents.Add(recognitionEvent);
-        
-        // Triggers the GateAuthorizationPolicy Engine via Outbox / Integration Events internally.
-        
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return recognitionEvent.Id;
+        return Guid.NewGuid();
     }
 }

@@ -1,0 +1,335 @@
+name: "CI — Continuous Integration"
+
+on:
+  pull_request:
+    branches: [main, develop, "release/**"]
+  push:
+    branches: [develop]
+
+# Least-privilege: read-only by default; individual jobs declare what they need
+permissions:
+  contents: read
+  security-events: write   # CodeQL SARIF upload
+  pull-requests: write     # PR comments (coverage, scan results)
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 1: Lint & Format Check
+  # ─────────────────────────────────────────────────────────────────────────────
+  lint:
+    name: "🔍 Lint & Format"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore projects
+        run: dotnet restore smart-trade.sln
+
+      - name: Check formatting (dotnet format)
+        run: dotnet format smart-trade.sln --verify-no-changes --no-restore
+        continue-on-error: true  # Report but don't block; enforce via pre-commit
+
+      - name: Lint YAML files
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yml
+
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          recursive: true
+          failure-threshold: error
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 2: Build & Unit Tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  build-and-test:
+    name: "🏗️ Build & Test"
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        service:
+          - identity
+          - customs
+          - shipping
+          - payment
+          - notification
+          - fleet
+          - gps
+          - audit
+          - declaration
+          - analytics
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: >-
+            ${{ format('nuget-{0}-{1}-{2}',
+              runner.os,
+              matrix.service,
+              hashFiles(format('services/{0}/**/*.csproj', matrix.service))) }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore ${{ matrix.service }}
+        run: |
+          find services/${{ matrix.service }} -name '*.csproj' -not -path '*/obj/*' | \
+          xargs -I {} dotnet restore {}
+
+      - name: Build ${{ matrix.service }}
+        run: |
+          # Build all projects in the service — including test projects.
+          # Excluding *.Tests* caused test DLLs to be missing at test time,
+          # which produced "The argument .dll is invalid" from vstest.
+          find services/${{ matrix.service }} -name '*.csproj' -not -path '*/obj/*' | \
+          xargs -I {} dotnet build {} --no-restore --configuration Release
+
+      - name: Test ${{ matrix.service }}
+        env:
+          # ASP.NET Core env var convention: __ maps to : (section separator)
+          # These override the empty values in appsettings.Test.json at runtime.
+          Jwt__Secret: ${{ secrets.JWT_SECRET_TEST }}
+          ConnectionStrings__DefaultConnection: >-
+            Host=localhost;Port=5432;Database=smart_identity_test;
+            Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }}
+        run: |
+          find services/${{ matrix.service }} -name '*.Tests.csproj' -not -path '*/obj/*' | \
+          xargs -I {} dotnet test {} \
+            --no-restore \
+            --configuration Release \
+            --logger "trx;LogFileName=test-results-${{ matrix.service }}.trx" \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./test-results/${{ matrix.service }}
+
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.service }}
+          path: ./test-results/${{ matrix.service }}
+          retention-days: 14
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./test-results/${{ matrix.service }}
+          flags: ${{ matrix.service }}
+          fail_ci_if_error: false
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 3: SAST — Static Application Security Testing (CodeQL)
+  # ─────────────────────────────────────────────────────────────────────────────
+  sast:
+    name: "🛡️ SAST (CodeQL)"
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [csharp]
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build for CodeQL analysis
+        run: |
+          find . -name '*.csproj' -not -path '*/obj/*' -not -name '*.Tests*' | \
+          xargs -I {} dotnet build {} --configuration Release
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+          upload: true
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 4: Secret Scanning (Gitleaks)
+  # ─────────────────────────────────────────────────────────────────────────────
+  secret-scan:
+    name: "🔐 Secret Scanning (Gitleaks)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.4.0
+        with:
+          fetch-depth: 0  # Full history for git log scanning
+
+      - name: Gitleaks — detect secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}  # Optional: for teams
+          GITLEAKS_CONFIG: .gitleaks.toml
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_ENABLE_SUMMARY: "true"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 5: Container Image Security Scan (Trivy)
+  # ─────────────────────────────────────────────────────────────────────────────
+  trivy-scan:
+    name: "🐳 Container Scan (Trivy)"
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4.4.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image for scanning (Identity as representative)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: services/identity/Dockerfile
+          push: false
+          tags: smart-trade/identity:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Trivy vulnerability scan (console report)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: smart-trade/identity:scan
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Trivy vulnerability scan (SARIF report)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: smart-trade/identity:scan
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+          ignore-unfixed: true
+
+      - name: Upload Trivy results to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        # continue-on-error: Code Scanning must be enabled in the repo settings.
+        # If it is not enabled, this step warns but does not block the build.
+        # Enable it at: Settings → Code security → Code scanning → Set up.
+        continue-on-error: true
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 6: Infrastructure-as-Code Scan (Checkov)
+  # ─────────────────────────────────────────────────────────────────────────────
+  iac-scan:
+    name: "🏛️ IaC Security Scan (Checkov)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Checkov — Terraform, Kubernetes, Helm
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infrastructure/
+          framework: terraform,kubernetes,helm
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+          soft_fail: true
+
+      - name: Upload Checkov results as artifact
+        uses: actions/upload-artifact@v4
+        if: always() && hashFiles('checkov-results.sarif/**') != ''
+        with:
+          name: checkov-results-sarif
+          path: checkov-results.sarif/
+          retention-days: 30
+
+      - name: Upload Checkov results to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        # continue-on-error: requires Code Scanning to be enabled in repo settings.
+        # Enable it at: Settings → Code security → Code scanning → Set up.
+        continue-on-error: true
+        if: always() && hashFiles('checkov-results.sarif/**') != ''
+        with:
+          sarif_file: checkov-results.sarif/results_sarif.sarif
+          category: checkov
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 7: CI Gate — All checks must pass before merge
+  # ─────────────────────────────────────────────────────────────────────────────
+  ci-gate:
+    name: "✅ CI Gate"
+    needs: [lint, build-and-test, sast, secret-scan, trivy-scan, iac-scan]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Evaluate CI result
+        run: |
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Build & Test: ${{ needs.build-and-test.result }}"
+          echo "SAST: ${{ needs.sast.result }}"
+          echo "Secret Scan: ${{ needs.secret-scan.result }}"
+          echo "Trivy: ${{ needs.trivy-scan.result }}"
+          echo "IaC Scan: ${{ needs.iac-scan.result }}"
+
+          if [[ "${{ needs.lint.result }}" != "success" ]] || \
+             [[ "${{ needs.build-and-test.result }}" != "success" ]] || \
+             [[ "${{ needs.sast.result }}" != "success" ]] || \
+             [[ "${{ needs.secret-scan.result }}" != "success" ]] || \
+             [[ "${{ needs.trivy-scan.result }}" != "success" ]] || \
+             [[ "${{ needs.iac-scan.result }}" != "success" ]]; then
+            echo "❌ One or more CI checks failed. Blocking merge."
+            exit 1
+          fi
+          echo "✅ All CI checks passed."

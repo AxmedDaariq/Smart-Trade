@@ -3,11 +3,12 @@ using Payment.Domain.Entities;
 using Payment.Domain.Entities.Billing;
 using Payment.Domain.Entities.Configuration;
 using Payment.Domain.Entities.Integration;
+using Payment.Application.Commands;
 using BuildingBlocks.Persistence; // Base SmartDbContext
 
 namespace Payment.Infrastructure.Persistence;
 
-public class PaymentDbContext : SmartDbContext
+public class PaymentDbContext : SmartDbContext<PaymentDbContext>, IPaymentDbContext
 {
     public PaymentDbContext(DbContextOptions<PaymentDbContext> options) : base(options) { }
 
@@ -15,6 +16,9 @@ public class PaymentDbContext : SmartDbContext
     public DbSet<PaymentIntent> PaymentIntents => Set<PaymentIntent>();
     public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
     public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
+
+    // ── IPaymentDbContext (Application-layer abstraction) ────────────────────
+    public void AddPaymentIntent(PaymentIntent intent) => PaymentIntents.Add(intent);
     
     // Billing
     public DbSet<Invoice> Invoices => Set<Invoice>();

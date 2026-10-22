@@ -15,8 +15,10 @@ export const LoginPage: React.FC = () => {
       console.log('Logging in with', { email, tenantCode });
       
       // Simulate successful response
-      const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-      login(mockToken, tenantCode, ['users.read', 'customs.read']);
+      // The backend now sets a Secure, HttpOnly cookie.
+      // The frontend no longer receives the token in the response body.
+      login(tenantCode, ['users.read', 'customs.read']);
+
       
     } catch (err) {
       setError('Invalid credentials or tenant code');

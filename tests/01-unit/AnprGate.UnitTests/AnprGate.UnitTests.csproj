@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AnprGate.UnitTests</AssemblyName>
+    <RootNamespace>AnprGate.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\services\anpr-gate\AnprGate.Domain\AnprGate.Domain.csproj" />
+    <ProjectReference Include="..\..\..\services\anpr-gate\AnprGate.Contracts\AnprGate.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\services\anpr-gate\AnprGate.Application\AnprGate.Application.csproj" />
+    <ProjectReference Include="..\..\..\services\anpr-gate\AnprGate.Infrastructure\AnprGate.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\services\anpr-gate\AnprGate.Api\AnprGate.Api.csproj" />
+  </ItemGroup>
+
+</Project>

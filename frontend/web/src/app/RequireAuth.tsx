@@ -1,18 +1,13 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-// import { useAuthStore } from '../stores/authStore'; // Imaginary global state store
+import { useAuth } from './auth/AuthContext';
 
 export const RequireAuth: React.FC = () => {
-  // const { isAuthenticated, isInitializing } = useAuthStore();
-  const isAuthenticated = true; // Mocked for scaffolding
-  const isInitializing = false;
+  const { session, isInitializing } = useAuth();
   const location = useLocation();
 
-  if (isInitializing) {
-    return <div>Loading authentication state...</div>;
-  }
-
-  if (!isAuthenticated) {
+  if (isInitializing) return <div role="status">Restoring session…</div>;
+  if (!session) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -20,9 +15,8 @@ export const RequireAuth: React.FC = () => {
 };
 
 export const RequirePermission: React.FC<{ permission: string }> = ({ permission }) => {
-  // const { permissions } = useAuthStore();
-  const permissions = ['control-tower.read']; // Mocked
-  const hasPermission = permissions.includes(permission);
+  const { session } = useAuth();
+  const hasPermission = session?.permissions.includes(permission) ?? false;
 
   if (!hasPermission) {
     return <Navigate to="/403" replace />;

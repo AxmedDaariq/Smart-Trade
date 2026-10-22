@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ectn.Application\Ectn.Application.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\persistence\BuildingBlocks.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,35 @@
+{
+  "customsDeclaration": {
+    "hsCode": "8517.12.00",
+    "declaredValue": 25000,
+    "currency": "USD",
+    "countryOfOrigin": "CN",
+    "description": "Electronic Components — Mobile Phones",
+    "quantity": 500,
+    "unit": "PCS"
+  },
+  "paymentMethods": {
+    "creditCard": {
+      "cardNumber": "4242424242424242",
+      "expiry": "12/28",
+      "cvv": "123",
+      "cardholderName": "Test Admin"
+    },
+    "bankTransfer": {
+      "bankName": "Dahabshiil Bank",
+      "accountNumber": "1234567890",
+      "routingCode": "DSH-001"
+    }
+  },
+  "invoice": {
+    "amount": 3750.00,
+    "currency": "USD",
+    "dueDate": "2026-11-30",
+    "lineItems": [
+      { "description": "Customs Duty",      "amount": 2500.00 },
+      { "description": "Processing Fee",    "amount":  500.00 },
+      { "description": "ECTN Fee",          "amount":  250.00 },
+      { "description": "Warehouse Storage", "amount":  500.00 }
+    ]
+  }
+}

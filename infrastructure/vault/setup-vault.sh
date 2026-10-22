@@ -2,6 +2,12 @@
 # Kani waa Script u qaabaysan Enterprise oo lagu rakibayo Policies, 
 # Kubernetes Auth (bedelka AppRole ee k8s), iyo Dynamic Database Credentials.
 
+# Hubi in DB_ADMIN_PASSWORD ay jirto
+if [ -z "$DB_ADMIN_PASSWORD" ]; then
+    echo "Error: DB_ADMIN_PASSWORD environment variable is not set."
+    exit 1
+fi
+
 # 1. Samaynta Vault Policies
 echo "Abuurista Vault Policies..."
 vault policy write customs-api-policy - <<EOF
@@ -48,7 +54,7 @@ vault write database/config/my-postgresql-database \
     allowed_roles="customs-db-role" \
     connection_url="postgresql://{{username}}:{{password}}@prod-db.smart-trade.com:5432/postgres" \
     username="admin" \
-    password="SuperSecretPassword"
+    password="${DB_ADMIN_PASSWORD}"
 
 # Abuurista Role u qaabilsan inuu abuuro Dynamic Credentials oo dhacaya (Expire) 1 saac kadib
 vault write database/roles/customs-db-role \

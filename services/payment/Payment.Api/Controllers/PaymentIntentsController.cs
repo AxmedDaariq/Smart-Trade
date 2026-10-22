@@ -23,10 +23,8 @@ public class PaymentIntentsController : ControllerBase
     [Authorize(Policy = "payment.intent.create")]
     public async Task<IActionResult> CreateIntent([FromBody] CreatePaymentIntentCommand command)
     {
-        if (User.HasClaim(c => c.Type == "tenantId"))
-        {
-            command.TenantId = Guid.Parse(User.FindFirst("tenantId").Value);
-        }
+        if (!Guid.TryParse(User.FindFirst("tenant_id")?.Value, out var tenantId)) return Forbid();
+        command.TenantId = tenantId;
 
         var intentId = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetIntent), new { id = intentId }, new { IntentId = intentId });
@@ -36,6 +34,6 @@ public class PaymentIntentsController : ControllerBase
     [Authorize(Policy = "payment.intent.read")]
     public async Task<IActionResult> GetIntent(Guid id)
     {
-        return Ok(new { Id = id, Status = "Pending" });
+        return Problem(statusCode: StatusCodes.Status501NotImplemented, title: "Payment intent lookup is not implemented.");
     }
 }

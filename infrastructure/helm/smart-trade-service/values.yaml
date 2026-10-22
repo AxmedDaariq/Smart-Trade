@@ -1,43 +1,146 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Default values for smart-trade-service Helm chart
+# Override per-service using environment-specific values files
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Number of replicas (ignored when autoscaling.enabled = true)
 replicaCount: 2
 
 image:
-  repository: your-docker-registry/smart-trade
-  pullPolicy: Always
-  tag: "latest"
+  repository: "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/smart-trade/service-name"
+  pullPolicy: IfNotPresent
+  tag: ""   # Overridden by GitOps tag update
 
+imagePullSecrets: []
+
+# ─── Service Account ──────────────────────────────────────────────────────────
+serviceAccount:
+  name: ""           # Defaults to fullname
+  irsaRoleArn: ""   # IAM role ARN for AWS SDK access (IRSA)
+
+# ─── Service ──────────────────────────────────────────────────────────────────
 service:
   type: ClusterIP
   port: 80
 
+containerPort: 8080
+
+# ─── Ingress ──────────────────────────────────────────────────────────────────
 ingress:
-  enabled: true
+  enabled: false   # Set per service; exposed via API gateway for most services
   className: "nginx"
-  host: "api.smart-trade.local"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  host: "api.smart-trade.io"
   path: "/"
   pathType: Prefix
+  tls:
+    - secretName: smart-trade-tls
+      hosts:
+        - api.smart-trade.io
 
+# ─── Resources ────────────────────────────────────────────────────────────────
 resources:
-  limits:
-    cpu: 200m
-    memory: 256Mi
   requests:
     cpu: 100m
     memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
 
-env: {}
-  # ASPNETCORE_ENVIRONMENT: "Production"
+# ─── Horizontal Pod Autoscaler ────────────────────────────────────────────────
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
 
+# ─── Pod Disruption Budget ────────────────────────────────────────────────────
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1    # Always keep at least 1 pod alive
+
+# ─── Network Policy ───────────────────────────────────────────────────────────
+networkPolicy:
+  enabled: true
+
+# ─── Health Probes ────────────────────────────────────────────────────────────
+probes:
+  startup:
+    path: /health/startup
+  liveness:
+    path: /health/live
+  readiness:
+    path: /health/ready
+
+# ─── Metrics (Prometheus) ─────────────────────────────────────────────────────
 metrics:
   enabled: true
-  path: "/metrics"
+  path: /metrics
+  port: 9090
 
+# ─── Observability ────────────────────────────────────────────────────────────
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "9090"
+
+# ─── Scheduling ───────────────────────────────────────────────────────────────
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - "{{ .Chart.Name }}"
+          topologyKey: kubernetes.io/hostname
+
+# ─── Graceful Shutdown ────────────────────────────────────────────────────────
+terminationGracePeriodSeconds: 60
+
+# ─── Extra Volumes ────────────────────────────────────────────────────────────
+volumes: []
+volumeMounts: []
+
+# ─── Init Containers ──────────────────────────────────────────────────────────
+initContainers: []
+
+# ─── Config & Secrets ─────────────────────────────────────────────────────────
+env: {}
+# ASPNETCORE_ENVIRONMENT: "Production"
+# ASPNETCORE_URLS: "http://+:8080"
+
+secretEnv: []
+# - name: ConnectionStrings__DefaultConnection
+#   valueFrom:
+#     secretKeyRef:
+#       name: db-credentials
+#       key: connection-string
+
+# ─── HashiCorp Vault ──────────────────────────────────────────────────────────
 vault:
   enabled: false
-  role: "app-role"
-  secretPath: "secret/data/my-service"
-  template: |
-    {{- with secret "secret/data/my-service" -}}
-    export DATABASE_URL="{{ .Data.data.database_url }}"
-    export API_KEY="{{ .Data.data.api_key }}"
-    {{- end -}}
+  role: ""
+  secretPath: ""
+  template: ""
 
+# ─── External Secrets Operator ────────────────────────────────────────────────
+externalSecrets:
+  enabled: false
+  secretStoreRef: "aws-parameter-store"
+  refreshInterval: "1h"
+  secrets: []
+  # - secretKey: db-password
+  #   remoteRef:
+  #     key: /smart-trade/production/db-password

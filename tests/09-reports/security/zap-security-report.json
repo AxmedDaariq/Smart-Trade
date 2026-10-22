@@ -1,0 +1,6 @@
+{
+  "target": "http://localhost:5000",
+  "timestamp": "2026-10-20T14:01:45.638Z",
+  "scanMode": "baseline",
+  "findings": []
+}

@@ -1,0 +1,12 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: io-stress-database
+spec:
+  action: stress
+  mode: all
+  selector:
+    labelSelectors:
+      'app': 'postgres-db'
+  duration: '2m'
+  interval: '1m'

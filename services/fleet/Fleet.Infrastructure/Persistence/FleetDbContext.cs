@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Fleet.Domain.Entities;
+using Fleet.Application.Commands;
 using BuildingBlocks.Persistence;
 
 namespace Fleet.Infrastructure.Persistence;
 
-public class FleetDbContext : SmartDbContext
+public class FleetDbContext : SmartDbContext<FleetDbContext>, IFleetDbContext
 {
     public FleetDbContext(DbContextOptions<FleetDbContext> options) : base(options) { }
 

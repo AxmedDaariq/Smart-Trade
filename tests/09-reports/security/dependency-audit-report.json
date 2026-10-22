@@ -1,0 +1,910 @@
+{
+  "timestamp": "2026-10-20T14:02:08.779Z",
+  "npmScans": [
+    {
+      "target": "frontend/web",
+      "vulnerabilities": {
+        "@istanbuljs/load-nyc-config": {
+          "name": "@istanbuljs/load-nyc-config",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "js-yaml"
+          ],
+          "effects": [
+            "babel-plugin-istanbul"
+          ],
+          "range": "*",
+          "nodes": [
+            "node_modules/@istanbuljs/load-nyc-config"
+          ],
+          "fixAvailable": {
+            "name": "babel-jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "@jest/core": {
+          "name": "@jest/core",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/reporters",
+            "@jest/transform",
+            "jest-config",
+            "jest-resolve-dependencies",
+            "jest-runner",
+            "jest-runtime",
+            "jest-snapshot"
+          ],
+          "effects": [
+            "jest"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/@jest/core"
+          ],
+          "fixAvailable": {
+            "name": "jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "@jest/expect": {
+          "name": "@jest/expect",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "jest-snapshot"
+          ],
+          "effects": [
+            "@jest/globals",
+            "jest-circus"
+          ],
+          "range": "*",
+          "nodes": [
+            "node_modules/@jest/expect"
+          ],
+          "fixAvailable": true
+        },
+        "@jest/globals": {
+          "name": "@jest/globals",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/expect"
+          ],
+          "effects": [
+            "jest-runtime"
+          ],
+          "range": ">=28.0.0-alpha.0",
+          "nodes": [
+            "node_modules/@jest/globals"
+          ],
+          "fixAvailable": true
+        },
+        "@jest/reporters": {
+          "name": "@jest/reporters",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/transform"
+          ],
+          "effects": [],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/@jest/reporters"
+          ],
+          "fixAvailable": true
+        },
+        "@jest/transform": {
+          "name": "@jest/transform",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "babel-plugin-istanbul"
+          ],
+          "effects": [
+            "@jest/core",
+            "@jest/reporters",
+            "jest-runner",
+            "jest-runtime",
+            "jest-snapshot",
+            "ts-jest"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/@jest/transform"
+          ],
+          "fixAvailable": {
+            "name": "ts-jest",
+            "version": "27.0.3",
+            "isSemVerMajor": true
+          }
+        },
+        "@typescript-eslint/eslint-plugin": {
+          "name": "@typescript-eslint/eslint-plugin",
+          "severity": "high",
+          "isDirect": true,
+          "via": [
+            "@typescript-eslint/type-utils",
+            "@typescript-eslint/utils"
+          ],
+          "effects": [],
+          "range": "6.16.0 - 7.5.0",
+          "nodes": [
+            "node_modules/@typescript-eslint/eslint-plugin"
+          ],
+          "fixAvailable": true
+        },
+        "@typescript-eslint/parser": {
+          "name": "@typescript-eslint/parser",
+          "severity": "high",
+          "isDirect": true,
+          "via": [
+            "@typescript-eslint/typescript-estree"
+          ],
+          "effects": [],
+          "range": "6.16.0 - 7.5.0",
+          "nodes": [
+            "node_modules/@typescript-eslint/parser"
+          ],
+          "fixAvailable": true
+        },
+        "@typescript-eslint/type-utils": {
+          "name": "@typescript-eslint/type-utils",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            "@typescript-eslint/typescript-estree",
+            "@typescript-eslint/utils"
+          ],
+          "effects": [],
+          "range": "6.16.0 - 7.5.0",
+          "nodes": [
+            "node_modules/@typescript-eslint/type-utils"
+          ],
+          "fixAvailable": true
+        },
+        "@typescript-eslint/typescript-estree": {
+          "name": "@typescript-eslint/typescript-estree",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            "globby",
+            "minimatch"
+          ],
+          "effects": [
+            "@typescript-eslint/parser",
+            "@typescript-eslint/type-utils",
+            "@typescript-eslint/utils"
+          ],
+          "range": "3.10.2-alpha.0 - 8.2.1-alpha.25",
+          "nodes": [
+            "node_modules/@typescript-eslint/typescript-estree"
+          ],
+          "fixAvailable": true
+        },
+        "@typescript-eslint/utils": {
+          "name": "@typescript-eslint/utils",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            "@typescript-eslint/typescript-estree"
+          ],
+          "effects": [
+            "@typescript-eslint/eslint-plugin"
+          ],
+          "range": "6.16.0 - 7.5.0",
+          "nodes": [
+            "node_modules/@typescript-eslint/utils"
+          ],
+          "fixAvailable": true
+        },
+        "argparse": {
+          "name": "argparse",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "sprintf-js"
+          ],
+          "effects": [
+            "js-yaml"
+          ],
+          "range": "1.0.0 - 1.0.10",
+          "nodes": [
+            "node_modules/@istanbuljs/load-nyc-config/node_modules/argparse"
+          ],
+          "fixAvailable": {
+            "name": "babel-jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "babel-jest": {
+          "name": "babel-jest",
+          "severity": "moderate",
+          "isDirect": true,
+          "via": [
+            "@jest/transform",
+            "babel-plugin-istanbul"
+          ],
+          "effects": [
+            "jest-config",
+            "ts-jest"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/babel-jest"
+          ],
+          "fixAvailable": {
+            "name": "babel-jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "babel-plugin-istanbul": {
+          "name": "babel-plugin-istanbul",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@istanbuljs/load-nyc-config"
+          ],
+          "effects": [
+            "@jest/transform",
+            "babel-jest"
+          ],
+          "range": ">=6.0.0-beta.0",
+          "nodes": [
+            "node_modules/babel-plugin-istanbul"
+          ],
+          "fixAvailable": {
+            "name": "babel-jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "braces": {
+          "name": "braces",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1240992,
+              "name": "braces",
+              "dependency": "braces",
+              "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+              "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+              "severity": "high",
+              "cwe": [
+                "CWE-674"
+              ],
+              "cvss": {
+                "score": 7.5,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+              },
+              "range": "<=3.0.3"
+            }
+          ],
+          "effects": [
+            "micromatch"
+          ],
+          "range": "*",
+          "nodes": [
+            "node_modules/braces"
+          ],
+          "fixAvailable": true
+        },
+        "esbuild": {
+          "name": "esbuild",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1102341,
+              "name": "esbuild",
+              "dependency": "esbuild",
+              "title": "esbuild enables any website to send any requests to the development server and read the response",
+              "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-346"
+              ],
+              "cvss": {
+                "score": 5.3,
+                "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+              },
+              "range": "<=0.24.2"
+            }
+          ],
+          "effects": [
+            "vite"
+          ],
+          "range": "<=0.24.2",
+          "nodes": [
+            "node_modules/esbuild"
+          ],
+          "fixAvailable": {
+            "name": "vite",
+            "version": "8.3.4",
+            "isSemVerMajor": true
+          }
+        },
+        "fast-glob": {
+          "name": "fast-glob",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            "micromatch"
+          ],
+          "effects": [
+            "globby"
+          ],
+          "range": "*",
+          "nodes": [
+            "node_modules/fast-glob"
+          ],
+          "fixAvailable": true
+        },
+        "globby": {
+          "name": "globby",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            "fast-glob"
+          ],
+          "effects": [
+            "@typescript-eslint/typescript-estree"
+          ],
+          "range": ">=8.0.0",
+          "nodes": [
+            "node_modules/globby"
+          ],
+          "fixAvailable": true
+        },
+        "handlebars": {
+          "name": "handlebars",
+          "severity": "critical",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1241676,
+              "name": "handlebars",
+              "dependency": "handlebars",
+              "title": "Handlebars: JavaScript Injection via Unsafe Inline Embedding of Precompiled Templates",
+              "url": "https://github.com/advisories/GHSA-xw65-4hp5-5hc7",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-116"
+              ],
+              "cvss": {
+                "score": 4.7,
+                "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N"
+              },
+              "range": ">=4.0.0 <=4.7.9"
+            },
+            {
+              "source": 1241677,
+              "name": "handlebars",
+              "dependency": "handlebars",
+              "title": "Handlebars: JavaScript Injection via AST Type Confusion in compile (bypass of CVE-2026-33937)",
+              "url": "https://github.com/advisories/GHSA-8r5x-fm3f-whwj",
+              "severity": "critical",
+              "cwe": [
+                "CWE-94",
+                "CWE-843"
+              ],
+              "cvss": {
+                "score": 9.8,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+              },
+              "range": ">=4.0.0 <=4.7.9"
+            },
+            {
+              "source": 1242173,
+              "name": "handlebars",
+              "dependency": "handlebars",
+              "title": "Handlebars: JavaScript Injection via Own Property Check Bypass",
+              "url": "https://github.com/advisories/GHSA-p8wg-vrv2-v86f",
+              "severity": "critical",
+              "cwe": [
+                "CWE-184",
+                "CWE-1289"
+              ],
+              "cvss": {
+                "score": 0,
+                "vectorString": null
+              },
+              "range": ">=3.0.0 <=4.7.9"
+            }
+          ],
+          "effects": [],
+          "range": "3.0.0 - 4.7.9",
+          "nodes": [
+            "node_modules/handlebars"
+          ],
+          "fixAvailable": true
+        },
+        "jest": {
+          "name": "jest",
+          "severity": "moderate",
+          "isDirect": true,
+          "via": [
+            "@jest/core",
+            "jest-cli"
+          ],
+          "effects": [
+            "ts-jest"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/jest"
+          ],
+          "fixAvailable": {
+            "name": "jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "jest-circus": {
+          "name": "jest-circus",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/expect",
+            "jest-runtime",
+            "jest-snapshot"
+          ],
+          "effects": [
+            "jest-config"
+          ],
+          "range": ">=25.2.4",
+          "nodes": [
+            "node_modules/jest-circus"
+          ],
+          "fixAvailable": true
+        },
+        "jest-cli": {
+          "name": "jest-cli",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/core",
+            "jest-config"
+          ],
+          "effects": [],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/jest-cli"
+          ],
+          "fixAvailable": true
+        },
+        "jest-config": {
+          "name": "jest-config",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "babel-jest",
+            "jest-circus",
+            "jest-runner"
+          ],
+          "effects": [
+            "jest-cli"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/jest-config"
+          ],
+          "fixAvailable": true
+        },
+        "jest-resolve-dependencies": {
+          "name": "jest-resolve-dependencies",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "jest-snapshot"
+          ],
+          "effects": [],
+          "range": ">=27.0.0-next.0",
+          "nodes": [
+            "node_modules/jest-resolve-dependencies"
+          ],
+          "fixAvailable": true
+        },
+        "jest-runner": {
+          "name": "jest-runner",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/transform",
+            "jest-runtime"
+          ],
+          "effects": [
+            "jest-config"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/jest-runner"
+          ],
+          "fixAvailable": true
+        },
+        "jest-runtime": {
+          "name": "jest-runtime",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/globals",
+            "@jest/transform",
+            "jest-snapshot"
+          ],
+          "effects": [
+            "jest-circus",
+            "jest-runner"
+          ],
+          "range": ">=25.1.0",
+          "nodes": [
+            "node_modules/jest-runtime"
+          ],
+          "fixAvailable": true
+        },
+        "jest-snapshot": {
+          "name": "jest-snapshot",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "@jest/transform"
+          ],
+          "effects": [
+            "@jest/core",
+            "@jest/expect",
+            "jest-circus",
+            "jest-resolve-dependencies",
+            "jest-runtime"
+          ],
+          "range": ">=27.0.0-next.0",
+          "nodes": [
+            "node_modules/jest-snapshot"
+          ],
+          "fixAvailable": {
+            "name": "jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "js-yaml": {
+          "name": "js-yaml",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            "argparse"
+          ],
+          "effects": [
+            "@istanbuljs/load-nyc-config"
+          ],
+          "range": "3.2.7 - 3.15.2",
+          "nodes": [
+            "node_modules/@istanbuljs/load-nyc-config/node_modules/js-yaml"
+          ],
+          "fixAvailable": {
+            "name": "babel-jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "micromatch": {
+          "name": "micromatch",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            "braces"
+          ],
+          "effects": [
+            "fast-glob"
+          ],
+          "range": ">=0.2.0",
+          "nodes": [
+            "node_modules/micromatch"
+          ],
+          "fixAvailable": true
+        },
+        "minimatch": {
+          "name": "minimatch",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1113465,
+              "name": "minimatch",
+              "dependency": "minimatch",
+              "title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+              "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+              "severity": "high",
+              "cwe": [
+                "CWE-1333"
+              ],
+              "cvss": {
+                "score": 0,
+                "vectorString": null
+              },
+              "range": ">=9.0.0 <9.0.6"
+            },
+            {
+              "source": 1113544,
+              "name": "minimatch",
+              "dependency": "minimatch",
+              "title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+              "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+              "severity": "high",
+              "cwe": [
+                "CWE-407"
+              ],
+              "cvss": {
+                "score": 7.5,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+              },
+              "range": ">=9.0.0 <9.0.7"
+            },
+            {
+              "source": 1113552,
+              "name": "minimatch",
+              "dependency": "minimatch",
+              "title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+              "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+              "severity": "high",
+              "cwe": [
+                "CWE-1333"
+              ],
+              "cvss": {
+                "score": 7.5,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+              },
+              "range": ">=9.0.0 <9.0.7"
+            }
+          ],
+          "effects": [
+            "@typescript-eslint/typescript-estree"
+          ],
+          "range": "9.0.0 - 9.0.6",
+          "nodes": [
+            "node_modules/minimatch"
+          ],
+          "fixAvailable": true
+        },
+        "react-router": {
+          "name": "react-router",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1124268,
+              "name": "react-router",
+              "dependency": "react-router",
+              "title": "React Router: Open redirect via backslash in <Link> and useNavigate (CVE-2025-68470 bypass)",
+              "url": "https://github.com/advisories/GHSA-wrjc-x8rr-h8h6",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-601"
+              ],
+              "cvss": {
+                "score": 0,
+                "vectorString": null
+              },
+              "range": ">=6.0.0 <7.18.0"
+            },
+            {
+              "source": 1124272,
+              "name": "react-router",
+              "dependency": "react-router",
+              "title": "React Router: Arbitrary Constructor Injection via deserializeErrors() in React Router SSR Hydration",
+              "url": "https://github.com/advisories/GHSA-337j-9hxr-rhxg",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-470"
+              ],
+              "cvss": {
+                "score": 6.1,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+              },
+              "range": ">=6.4.0 <7.18.0"
+            }
+          ],
+          "effects": [
+            "react-router-dom"
+          ],
+          "range": "6.0.0 - 7.17.0",
+          "nodes": [
+            "node_modules/react-router"
+          ],
+          "fixAvailable": {
+            "name": "react-router-dom",
+            "version": "7.18.4",
+            "isSemVerMajor": true
+          }
+        },
+        "react-router-dom": {
+          "name": "react-router-dom",
+          "severity": "moderate",
+          "isDirect": true,
+          "via": [
+            "react-router"
+          ],
+          "effects": [],
+          "range": "6.0.0-alpha.0 - 7.17.0",
+          "nodes": [
+            "node_modules/react-router-dom"
+          ],
+          "fixAvailable": {
+            "name": "react-router-dom",
+            "version": "7.18.4",
+            "isSemVerMajor": true
+          }
+        },
+        "source-map-js": {
+          "name": "source-map-js",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1241209,
+              "name": "source-map-js",
+              "dependency": "source-map-js",
+              "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+              "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+              "severity": "high",
+              "cwe": [
+                "CWE-1284"
+              ],
+              "cvss": {
+                "score": 7.5,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+              },
+              "range": ">=1.0.0 <1.2.2"
+            }
+          ],
+          "effects": [],
+          "range": "1.0.0 - 1.2.1",
+          "nodes": [
+            "node_modules/source-map-js"
+          ],
+          "fixAvailable": true
+        },
+        "sprintf-js": {
+          "name": "sprintf-js",
+          "severity": "moderate",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1241202,
+              "name": "sprintf-js",
+              "dependency": "sprintf-js",
+              "title": "sprintf-js vulnerable to denial of service through unbounded precision specifiers",
+              "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-1284"
+              ],
+              "cvss": {
+                "score": 5.3,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+              },
+              "range": "<=1.1.3"
+            }
+          ],
+          "effects": [
+            "argparse"
+          ],
+          "range": "*",
+          "nodes": [
+            "node_modules/sprintf-js"
+          ],
+          "fixAvailable": {
+            "name": "babel-jest",
+            "version": "25.0.0",
+            "isSemVerMajor": true
+          }
+        },
+        "ts-jest": {
+          "name": "ts-jest",
+          "severity": "moderate",
+          "isDirect": true,
+          "via": [
+            "@jest/transform",
+            "babel-jest",
+            "jest"
+          ],
+          "effects": [],
+          "range": ">=25.10.0-alpha.1",
+          "nodes": [
+            "node_modules/ts-jest"
+          ],
+          "fixAvailable": {
+            "name": "ts-jest",
+            "version": "27.0.3",
+            "isSemVerMajor": true
+          }
+        },
+        "vite": {
+          "name": "vite",
+          "severity": "high",
+          "isDirect": true,
+          "via": [
+            {
+              "source": 1116229,
+              "name": "vite",
+              "dependency": "vite",
+              "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+              "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-22",
+                "CWE-200"
+              ],
+              "cvss": {
+                "score": 0,
+                "vectorString": null
+              },
+              "range": "<=6.4.1"
+            },
+            {
+              "source": 1120784,
+              "name": "vite",
+              "dependency": "vite",
+              "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+              "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+              "severity": "moderate",
+              "cwe": [
+                "CWE-73",
+                "CWE-522"
+              ],
+              "cvss": {
+                "score": 0,
+                "vectorString": null
+              },
+              "range": "<=6.4.2"
+            },
+            {
+              "source": 1123525,
+              "name": "vite",
+              "dependency": "vite",
+              "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+              "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+              "severity": "high",
+              "cwe": [
+                "CWE-22",
+                "CWE-200"
+              ],
+              "cvss": {
+                "score": 7.5,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+              },
+              "range": "<=6.4.2"
+            },
+            "esbuild"
+          ],
+          "effects": [],
+          "range": "<=6.4.2",
+          "nodes": [
+            "node_modules/vite"
+          ],
+          "fixAvailable": {
+            "name": "vite",
+            "version": "8.3.4",
+            "isSemVerMajor": true
+          }
+        }
+      }
+    }
+  ],
+  "dotnetScans": [
+    {
+      "status": "AUDIT_OUTPUT",
+      "details": "  Determining projects to restore...\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\AisVessel.UnitTests\\AisVessel.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Audit.UnitTests\\Audit.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\GpsTelematics.UnitTests\\GpsTelematics.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Integration.UnitTests\\Integration.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Analytics.UnitTests\\Analytics.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Payment.UnitTests\\Payment.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Declaration.UnitTests\\Declaration.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Shipping.UnitTests\\Shipping.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Ectn.UnitTests\\Ectn.UnitTests.csproj : warning NU1504: Duplicate 'PackageReference' items found. Remove the duplicate items or use the Update functionality to ensure a consistent restore behavior. The duplicate 'PackageReference' items are: Moq 4.20.70, Moq 4.20.70.\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Integration.IntegrationTests\\Integration.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shared\\Shared.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Integration.IntegrationTests\\Integration.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shared\\Shared.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Integration.IntegrationTests\\Integration.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Integration.UnitTests\\Integration.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shipping.IntegrationTests\\Shipping.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Payment.IntegrationTests\\Payment.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shipping.IntegrationTests\\Shipping.IntegrationTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Payment.IntegrationTests\\Payment.IntegrationTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shipping.IntegrationTests\\Shipping.IntegrationTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shipping.IntegrationTests\\Shipping.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Payment.IntegrationTests\\Payment.IntegrationTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Shipping.IntegrationTests\\Shipping.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\shipping\\Shipping.Tests\\Shipping.Tests.csproj : warning NU1603: Shipping.Tests depends on Microsoft.NET.Test.Sdk (>= 17.15.0) but Microsoft.NET.Test.Sdk 17.15.0 was not found. Microsoft.NET.Test.Sdk 18.0.0 was resolved instead. [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\shipping\\Shipping.Tests\\Shipping.Tests.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Payment.IntegrationTests\\Payment.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\shipping\\Shipping.Tests\\Shipping.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Payment.IntegrationTests\\Payment.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\shipping\\Shipping.Tests\\Shipping.Tests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\shipping\\Shipping.Tests\\Shipping.Tests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\gps-telematics\\GpsTelematics.Tests\\GpsTelematics.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\ais-vessel\\AisVessel.Tests\\AisVessel.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\GpsTelematics.IntegrationTests\\GpsTelematics.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\GpsTelematics.IntegrationTests\\GpsTelematics.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\GpsTelematics.IntegrationTests\\GpsTelematics.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Fleet.IntegrationTests\\Fleet.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Fleet.IntegrationTests\\Fleet.IntegrationTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Fleet.IntegrationTests\\Fleet.IntegrationTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Fleet.IntegrationTests\\Fleet.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Fleet.IntegrationTests\\Fleet.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\identity\\Identity.Tests\\Identity.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\identity\\Identity.Tests\\Identity.Tests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\identity\\Identity.Tests\\Identity.Tests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\identity\\Identity.Tests\\Identity.Tests.csproj : warning NU1902: Package 'System.Security.Cryptography.Xml' 4.5.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-vh55-786g-wjwj [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Corridor.IntegrationTests\\Corridor.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Corridor.IntegrationTests\\Corridor.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Corridor.IntegrationTests\\Corridor.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Audit.IntegrationTests\\Audit.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Audit.IntegrationTests\\Audit.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Audit.IntegrationTests\\Audit.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Shipping.UnitTests\\Shipping.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Shipping.UnitTests\\Shipping.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Shipping.UnitTests\\Shipping.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\AnprGate.IntegrationTests\\AnprGate.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\AnprGate.IntegrationTests\\AnprGate.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\AnprGate.IntegrationTests\\AnprGate.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Analytics.IntegrationTests\\Analytics.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Analytics.IntegrationTests\\Analytics.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Analytics.IntegrationTests\\Analytics.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\AisVessel.IntegrationTests\\AisVessel.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\AisVessel.IntegrationTests\\AisVessel.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\AisVessel.IntegrationTests\\AisVessel.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Fleet.UnitTests\\Fleet.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Fleet.UnitTests\\Fleet.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Fleet.UnitTests\\Fleet.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\GpsTelematics.UnitTests\\GpsTelematics.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Identity.UnitTests\\Identity.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Identity.UnitTests\\Identity.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Identity.UnitTests\\Identity.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Payment.UnitTests\\Payment.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Payment.UnitTests\\Payment.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Payment.UnitTests\\Payment.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Customs.UnitTests\\Customs.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Customs.UnitTests\\Customs.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Customs.UnitTests\\Customs.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Corridor.UnitTests\\Corridor.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Audit.UnitTests\\Audit.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Analytics.UnitTests\\Analytics.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\AnprGate.UnitTests\\AnprGate.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\AisVessel.UnitTests\\AisVessel.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Identity.IntegrationTests\\Identity.IntegrationTests.csproj : warning NU1902: Package 'System.Security.Cryptography.Xml' 4.5.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-vh55-786g-wjwj [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Declaration.IntegrationTests\\Declaration.IntegrationTests.csproj : warning NU1903: Package 'Npgsql' 8.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Declaration.UnitTests\\Declaration.UnitTests.csproj : warning NU1903: Package 'Npgsql' 8.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Declaration.UnitTests\\Declaration.UnitTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.7.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Declaration.IntegrationTests\\Declaration.IntegrationTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.7.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Declaration.UnitTests\\Declaration.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Declaration.IntegrationTests\\Declaration.IntegrationTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Declaration.UnitTests\\Declaration.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Declaration.IntegrationTests\\Declaration.IntegrationTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Declaration.IntegrationTests\\Declaration.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Declaration.IntegrationTests\\Declaration.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\fleet\\Fleet.Tests\\Fleet.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\fleet\\Fleet.Tests\\Fleet.Tests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\fleet\\Fleet.Tests\\Fleet.Tests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\ectn\\Ectn.Tests\\Ectn.Tests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.11.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Ectn.IntegrationTests\\Ectn.IntegrationTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.11.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Ectn.UnitTests\\Ectn.UnitTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.11.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-8785-wc3w-h8q6 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Ectn.IntegrationTests\\Ectn.IntegrationTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.11.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\ectn\\Ectn.Tests\\Ectn.Tests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.11.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Ectn.UnitTests\\Ectn.UnitTests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.11.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\ectn\\Ectn.Tests\\Ectn.Tests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Ectn.UnitTests\\Ectn.UnitTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Ectn.IntegrationTests\\Ectn.IntegrationTests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\01-unit\\Ectn.UnitTests\\Ectn.UnitTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Ectn.IntegrationTests\\Ectn.IntegrationTests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\ectn\\Ectn.Tests\\Ectn.Tests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Ectn.IntegrationTests\\Ectn.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mggc-4xg6-vcxf [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\tests\\02-integration\\Ectn.IntegrationTests\\Ectn.IntegrationTests.csproj : warning NU1903: Package 'SSH.NET' 2023.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q939-rpr3-3284 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\anpr-gate\\AnprGate.Tests\\AnprGate.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\declaration\\Declaration.Tests\\Declaration.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\declaration\\Declaration.Tests\\Declaration.Tests.csproj : warning NU1902: Package 'OpenTelemetry.Api' 1.7.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g94r-2vxg-569j [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\declaration\\Declaration.Tests\\Declaration.Tests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\declaration\\Declaration.Tests\\Declaration.Tests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\customs\\Customs.Tests\\Customs.Tests.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\customs\\Customs.Tests\\Customs.Tests.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\customs\\Customs.Tests\\Customs.Tests.csproj : warning NU1902: Package 'SharpCompress' 0.30.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-6c8g-7p36-r338 [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\nD:\\Enterprise Applications\\smart-trade-logistics-platform\\services\\customs\\Customs.Tests\\Customs.Tests.csproj : warning NU1903: Package 'Snappier' 1.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pggp-6c3x-2xmx [D:\\Enterprise Applications\\smart-trade-logistics-platform\\smart-trade.sln]\r\n  All projects are up-to-date for restore.\r\nerror: Unable to load the service index for source https://api.nuget.org/v3/index.json.\r\nerror:   No such host is known. (api.nuget.org:443)\r\nerror:   No such host is known.\r\n"
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "moderate": 0,
+    "low": 0
+  }
+}

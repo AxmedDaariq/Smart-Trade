@@ -4,19 +4,35 @@ using System.Security.Cryptography;
 using System.Text;
 using Identity.Application.Interfaces;
 using Identity.Domain.Entities;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.Infrastructure.Security;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
-    private readonly string _secretKey = "SUPER_SECRET_KEY_THAT_SHOULD_BE_IN_VAULT_NOT_HERE";
-    private readonly string _issuer = "SmartTradePlatform";
-    private readonly string _audience = "SmartTradeServices";
+    private readonly JwtTokenOptions _options;
+
+    public JwtTokenGenerator(IOptions<JwtTokenOptions> options)
+    {
+        _options = options.Value;
+        if (Encoding.UTF8.GetByteCount(_options.Secret) < 32)
+        {
+            throw new InvalidOperationException("JWT signing key must contain at least 32 UTF-8 bytes.");
+        }
+        if (string.IsNullOrWhiteSpace(_options.Issuer) || string.IsNullOrWhiteSpace(_options.Audience))
+        {
+            throw new InvalidOperationException("JWT issuer and audience must be configured.");
+        }
+        if (_options.AccessTokenLifetimeMinutes is < 1 or > 60)
+        {
+            throw new InvalidOperationException("JWT access token lifetime must be between 1 and 60 minutes.");
+        }
+    }
 
     public string GenerateAccessToken(User user, Tenant tenant, IEnumerable<string> permissions)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
@@ -25,7 +41,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim("tenant_id", tenant.Id.ToString()),
-            new Claim("tenant_code", tenant.Code)
+            new Claim("tenant_code", tenant.TenantCode)
         };
 
         if (user.OrganizationId.HasValue)
@@ -38,11 +54,14 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             claims.Add(new Claim("permissions", permission));
         }
 
+        var issuedAt = DateTime.UtcNow;
+
         var token = new JwtSecurityToken(
-            issuer: _issuer,
-            audience: _audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(15), // Short-lived
+            notBefore: issuedAt,
+            expires: issuedAt.AddMinutes(_options.AccessTokenLifetimeMinutes),
+            issuer: _options.Issuer,
+            audience: _options.Audience,
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
