@@ -1,9 +1,11 @@
 name: "CD — Continuous Delivery"
 
+# Disabled automatic triggers since AWS credentials/ECR are not configured yet.
+# To run this workflow, trigger it manually from the GitHub Actions tab via workflow_dispatch.
 on:
-  push:
-    branches: [main]
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  # push:
+  #   branches: [main]
+  #   tags: ["v[0-9]+.[0-9]+.[0-9]+"]
   workflow_dispatch:
     inputs:
       environment:
