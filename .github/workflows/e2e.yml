@@ -1,0 +1,241 @@
+name: "E2E — Cypress Tests"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Triggers: runs on PRs and pushes to main/develop.
+# Can also be triggered manually with optional spec filter.
+# ─────────────────────────────────────────────────────────────────────────────
+on:
+  pull_request:
+    branches: [main, develop, "release/**"]
+    paths:
+      - "tests/03-e2e/**"
+      - "services/**"
+      - "frontend/**"
+      - ".github/workflows/e2e.yml"
+  push:
+    branches: [develop, main]
+    paths:
+      - "tests/03-e2e/**"
+  workflow_dispatch:
+    inputs:
+      spec:
+        description: "Cypress spec glob (leave empty to run all)"
+        required: false
+        default: ""
+      browser:
+        description: "Browser to use"
+        required: false
+        default: "chrome"
+        type: choice
+        options: [electron, chrome, firefox]
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB: Cypress E2E Tests
+  # ─────────────────────────────────────────────────────────────────────────────
+  cypress-e2e:
+    name: "🌐 Cypress E2E — ${{ matrix.suite }}"
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - api        # Backend API tests (no browser / UI needed)
+          - frontend   # UI + auth flows
+          - database   # DB, Mongo, Redis, RabbitMQ verification
+          - full-stack # End-to-end corridor + multi-tenant lifecycle
+
+    # ── Backing services required by tests ──────────────────────────────
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: smart_trade
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping:1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      rabbitmq:
+        image: rabbitmq:3.13-management-alpine
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────
+      - name: Checkout code
+        uses: actions/checkout@v4.4.0
+
+      # ── 2. Node.js ─────────────────────────────────────────────────────
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: tests/03-e2e/cypress/package-lock.json
+
+      # ── 3. Cypress binary cache ────────────────────────────────────────
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CYPRESS_CACHE_FOLDER }}
+          key: cypress-${{ runner.os }}-${{ hashFiles('tests/03-e2e/cypress/package-lock.json') }}
+          restore-keys: cypress-${{ runner.os }}-
+
+      # ── 4. Install dependencies ────────────────────────────────────────
+      - name: Install Cypress dependencies
+        working-directory: tests/03-e2e/cypress
+        run: npm ci --prefer-offline
+
+      # ── 5. Verify Cypress binary is installed & usable ─────────────────
+      - name: Verify Cypress installation
+        working-directory: tests/03-e2e/cypress
+        run: npx cypress verify
+
+      # ── 6. Determine spec pattern from matrix ─────────────────────────
+      - name: Set spec pattern
+        id: spec
+        run: |
+          MANUAL_SPEC="${{ inputs.spec }}"
+          if [ -n "$MANUAL_SPEC" ]; then
+            echo "pattern=$MANUAL_SPEC" >> "$GITHUB_OUTPUT"
+          else
+            case "${{ matrix.suite }}" in
+              api)        echo "pattern=cypress/e2e/backend/**/*.cy.js"        >> "$GITHUB_OUTPUT" ;;
+              frontend)   echo "pattern=cypress/e2e/frontend/**/*.cy.js"       >> "$GITHUB_OUTPUT" ;;
+              database)   echo "pattern=cypress/e2e/database/**/*.cy.js"       >> "$GITHUB_OUTPUT" ;;
+              full-stack) echo "pattern=cypress/e2e/full-stack/**/*.cy.js"     >> "$GITHUB_OUTPUT" ;;
+              *)          echo "pattern=cypress/e2e/**/*.cy.js"                >> "$GITHUB_OUTPUT" ;;
+            esac
+          fi
+
+      # ── 7. Run Cypress ─────────────────────────────────────────────────
+      - name: Run Cypress — ${{ matrix.suite }}
+        working-directory: tests/03-e2e/cypress
+        env:
+          # ── Infrastructure URLs ──────────────────────────────────────
+          CYPRESS_BASE_URL:    ${{ vars.E2E_BASE_URL || 'http://localhost:5173' }}
+          API_URL:             ${{ vars.E2E_API_URL  || 'http://localhost:5000' }}
+          GATEWAY_URL:         ${{ vars.E2E_GATEWAY  || 'http://localhost:8080' }}
+
+          # ── Auth credentials (from GitHub Secrets) ───────────────────
+          ADMIN_EMAIL:         ${{ secrets.E2E_ADMIN_EMAIL    || 'admin@acme.com' }}
+          ADMIN_PASS:          ${{ secrets.E2E_ADMIN_PASS     || 'Admin@123456!' }}
+          DRIVER_EMAIL:        ${{ secrets.E2E_DRIVER_EMAIL   || 'driver_test@smarttrade.com' }}
+          DRIVER_PASS:         ${{ secrets.E2E_DRIVER_PASS    || 'DriverPass123!' }}
+
+          # ── Database connections (use service container defaults) ─────
+          DB_HOST:     localhost
+          DB_PORT:     "5432"
+          DB_USER:     postgres
+          DB_PASS:     postgres
+          DB_NAME:     smart_trade
+          MONGO_URL:   mongodb://localhost:27017/smart_trade
+          REDIS_URL:   redis://localhost:6379
+          RABBITMQ_API: http://localhost:15672/api
+          RABBITMQ_USER: guest
+          RABBITMQ_PASS: guest
+
+          # ── Cypress tuning ───────────────────────────────────────────
+          CYPRESS_VIDEO:                    "false"
+          CYPRESS_SCREENSHOT_ON_RUN_FAILURE: "true"
+
+        run: |
+          BROWSER="${{ inputs.browser || 'chrome' }}"
+          SPEC="${{ steps.spec.outputs.pattern }}"
+          npx cypress run \
+            --browser "$BROWSER" \
+            --headless \
+            --spec "$SPEC" \
+            --config "video=false,watchForFileChanges=false" \
+            --reporter cypress-mochawesome-reporter \
+            --reporter-options "reportDir=cypress/reports/${{ matrix.suite }},overwrite=false,html=true,json=true"
+
+      # ── 8. Upload test results always (even on failure) ───────────────
+      - name: Upload Cypress artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-${{ matrix.suite }}-results
+          path: |
+            tests/03-e2e/cypress/cypress/reports/
+            tests/03-e2e/cypress/cypress/screenshots/
+            tests/03-e2e/cypress/cypress/videos/
+          retention-days: 14
+
+      # ── 9. Publish test summary to PR (requires checks: write) ────────
+      - name: Publish test summary
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: "Cypress E2E — ${{ matrix.suite }}"
+          path: "tests/03-e2e/cypress/cypress/reports/${{ matrix.suite }}/*.json"
+          reporter: mochawesome-json
+          fail-on-error: false
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Gate: summarise all suite results
+  # ─────────────────────────────────────────────────────────────────────────────
+  e2e-gate:
+    name: "✅ E2E Gate"
+    needs: cypress-e2e
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Evaluate E2E results
+        run: |
+          RESULT="${{ needs.cypress-e2e.result }}"
+          echo "Cypress E2E result: $RESULT"
+          if [[ "$RESULT" != "success" ]]; then
+            echo "::error::One or more Cypress E2E suites failed."
+            exit 1
+          fi
+          echo "::notice::All Cypress E2E suites passed."

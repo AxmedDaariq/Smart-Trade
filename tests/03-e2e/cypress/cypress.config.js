@@ -6,18 +6,21 @@ module.exports = defineConfig({
   projectId: 'smart-trade-e2e',
   viewportWidth: 1440,
   viewportHeight: 900,
-  video: true,
+  video: false,                     // disabled in CI (enabled via --config override locally)
   screenshotOnRunFailure: true,
-  watchForFileChanges: true,
-  defaultCommandTimeout: 10000,
+  watchForFileChanges: false,       // must be false for headless / CI mode
+  defaultCommandTimeout: 12000,
   requestTimeout: 15000,
   responseTimeout: 30000,
+  pageLoadTimeout: 30000,
+  numTestsKeptInMemory: 10,         // prevents memory exhaustion in long CI runs
+  experimentalMemoryManagement: true,
   retries: {
     runMode: 2,    // CI retries
     openMode: 0,   // Dev retries
   },
 
-  // Reporter – Mochawesome for HTML reports in tests/09-reports
+  // Reporter – Mochawesome for HTML reports
   reporter: 'cypress-mochawesome-reporter',
   reporterOptions: {
     reportDir: 'cypress/reports',
@@ -26,6 +29,9 @@ module.exports = defineConfig({
     embeddedScreenshots: true,
     inlineAssets: true,
     saveAllAttempts: false,
+    overwrite: false,
+    html: true,
+    json: true,
   },
 
   // ─────────────────────────────── E2E ──────────────────────────────────
@@ -35,7 +41,15 @@ module.exports = defineConfig({
     supportFile: 'cypress/support/e2e.js',
     fixturesFolder: 'cypress/fixtures',
 
+    // ── Ensure reports dir exists before run ──
     setupNodeEvents(on, config) {
+      const fs = require('fs');
+      const path = require('path');
+
+      // Create reports directory if missing
+      const reportsDir = path.join(__dirname, 'cypress', 'reports');
+      if (!fs.existsSync(reportsDir)) fs.mkdirSync(reportsDir, { recursive: true });
+
       // ─── Mochawesome reporter ───
       try {
         require('cypress-mochawesome-reporter/plugin')(on);
@@ -75,7 +89,6 @@ module.exports = defineConfig({
       config.env.RABBITMQ_PASS = process.env.RABBITMQ_PASS ?? 'guest';
 
       // ───────────────── Node Tasks ─────────────────
-
       on('task', {
 
         // ═════════════════════ POSTGRESQL ═════════════════════
@@ -88,6 +101,8 @@ module.exports = defineConfig({
             user:     config.env.DB_USER,
             password: config.env.DB_PASS,
             database: config.env.DB_NAME,
+            connectionTimeoutMillis: 5000,
+            ssl:      process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           });
           await client.connect();
           try {
@@ -106,6 +121,8 @@ module.exports = defineConfig({
             user:     config.env.DB_USER,
             password: config.env.DB_PASS,
             database: config.env.DB_NAME,
+            connectionTimeoutMillis: 5000,
+            ssl:      process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           });
           await client.connect();
           try {
@@ -128,6 +145,8 @@ module.exports = defineConfig({
             user:     config.env.DB_USER,
             password: config.env.DB_PASS,
             database: config.env.DB_NAME,
+            connectionTimeoutMillis: 5000,
+            ssl:      process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           });
           await client.connect();
           try {
@@ -237,7 +256,12 @@ module.exports = defineConfig({
         async redisPing() {
           try {
             const Redis = require('ioredis');
-            const redis = new Redis(config.env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000, lazyConnect: true });
+            const redis = new Redis(config.env.REDIS_URL, {
+              maxRetriesPerRequest: 1,
+              connectTimeout: 3000,
+              lazyConnect: true,
+              enableAutoPipelining: false,
+            });
             await redis.connect();
             const pong = await redis.ping();
             await redis.disconnect();
@@ -250,7 +274,11 @@ module.exports = defineConfig({
         // ── Redis: Set key value with optional TTL ──
         async redisSet({ key, value, ttlSeconds }) {
           const Redis = require('ioredis');
-          const redis = new Redis(config.env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000, lazyConnect: true });
+          const redis = new Redis(config.env.REDIS_URL, {
+            maxRetriesPerRequest: 1,
+            connectTimeout: 3000,
+            lazyConnect: true,
+          });
           try {
             await redis.connect();
             const strVal = typeof value === 'object' ? JSON.stringify(value) : String(value);
@@ -268,16 +296,16 @@ module.exports = defineConfig({
         // ── Redis: Get key value (auto-parses JSON) ──
         async redisGet({ key }) {
           const Redis = require('ioredis');
-          const redis = new Redis(config.env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000, lazyConnect: true });
+          const redis = new Redis(config.env.REDIS_URL, {
+            maxRetriesPerRequest: 1,
+            connectTimeout: 3000,
+            lazyConnect: true,
+          });
           try {
             await redis.connect();
             const raw = await redis.get(key);
             if (raw === null) return null;
-            try {
-              return JSON.parse(raw);
-            } catch (_) {
-              return raw;
-            }
+            try { return JSON.parse(raw); } catch (_) { return raw; }
           } finally {
             redis.disconnect();
           }
@@ -286,7 +314,11 @@ module.exports = defineConfig({
         // ── Redis: Delete key ──
         async redisDel({ key }) {
           const Redis = require('ioredis');
-          const redis = new Redis(config.env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000, lazyConnect: true });
+          const redis = new Redis(config.env.REDIS_URL, {
+            maxRetriesPerRequest: 1,
+            connectTimeout: 3000,
+            lazyConnect: true,
+          });
           try {
             await redis.connect();
             const deleted = await redis.del(key);
@@ -299,7 +331,11 @@ module.exports = defineConfig({
         // ── Redis: Check key existence ──
         async redisExists({ key }) {
           const Redis = require('ioredis');
-          const redis = new Redis(config.env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000, lazyConnect: true });
+          const redis = new Redis(config.env.REDIS_URL, {
+            maxRetriesPerRequest: 1,
+            connectTimeout: 3000,
+            lazyConnect: true,
+          });
           try {
             await redis.connect();
             const exists = await redis.exists(key);
@@ -312,14 +348,16 @@ module.exports = defineConfig({
         // ── Redis: Flush keys matching pattern ──
         async redisFlushPattern({ pattern }) {
           const Redis = require('ioredis');
-          const redis = new Redis(config.env.REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000, lazyConnect: true });
+          const redis = new Redis(config.env.REDIS_URL, {
+            maxRetriesPerRequest: 1,
+            connectTimeout: 3000,
+            lazyConnect: true,
+          });
           try {
             await redis.connect();
             const keys = await redis.keys(pattern);
             let count = 0;
-            if (keys.length > 0) {
-              count = await redis.del(...keys);
-            }
+            if (keys.length > 0) { count = await redis.del(...keys); }
             return { deletedCount: count };
           } finally {
             redis.disconnect();
@@ -333,10 +371,7 @@ module.exports = defineConfig({
           const axios = require('axios');
           try {
             const res = await axios.get(`${config.env.RABBITMQ_API}/overview`, {
-              auth: {
-                username: config.env.RABBITMQ_USER,
-                password: config.env.RABBITMQ_PASS,
-              },
+              auth: { username: config.env.RABBITMQ_USER, password: config.env.RABBITMQ_PASS },
               timeout: 4000,
             });
             return {
@@ -354,10 +389,7 @@ module.exports = defineConfig({
         async rabbitPublish({ exchange = '', routingKey = '', message = {} }) {
           const axios = require('axios');
           const payload = {
-            properties: {
-              content_type: 'application/json',
-              delivery_mode: 2, // persistent
-            },
+            properties: { content_type: 'application/json', delivery_mode: 2 },
             routing_key: routingKey,
             payload: typeof message === 'string' ? message : JSON.stringify(message),
             payload_encoding: 'string',
@@ -367,13 +399,7 @@ module.exports = defineConfig({
             const res = await axios.post(
               `${config.env.RABBITMQ_API}/exchanges/%2f/${targetExchange}/publish`,
               payload,
-              {
-                auth: {
-                  username: config.env.RABBITMQ_USER,
-                  password: config.env.RABBITMQ_PASS,
-                },
-                timeout: 4000,
-              }
+              { auth: { username: config.env.RABBITMQ_USER, password: config.env.RABBITMQ_PASS }, timeout: 4000 }
             );
             return { routed: res.data.routed, details: res.data };
           } catch (err) {
@@ -387,13 +413,7 @@ module.exports = defineConfig({
           try {
             const res = await axios.get(
               `${config.env.RABBITMQ_API}/queues/%2f/${encodeURIComponent(queue)}`,
-              {
-                auth: {
-                  username: config.env.RABBITMQ_USER,
-                  password: config.env.RABBITMQ_PASS,
-                },
-                timeout: 4000,
-              }
+              { auth: { username: config.env.RABBITMQ_USER, password: config.env.RABBITMQ_PASS }, timeout: 4000 }
             );
             return {
               exists: true,
@@ -416,13 +436,7 @@ module.exports = defineConfig({
           try {
             const res = await axios.delete(
               `${config.env.RABBITMQ_API}/queues/%2f/${encodeURIComponent(queue)}/contents`,
-              {
-                auth: {
-                  username: config.env.RABBITMQ_USER,
-                  password: config.env.RABBITMQ_PASS,
-                },
-                timeout: 4000,
-              }
+              { auth: { username: config.env.RABBITMQ_USER, password: config.env.RABBITMQ_PASS }, timeout: 4000 }
             );
             return { purged: true, details: res.data };
           } catch (err) {
